@@ -14,17 +14,31 @@
   var FULL = 'Home holds nine apps. Remove one first.', LAST = 'Home needs one app';
 
   var PRIMARY_APPS = [
+    { id: 'appletv', name: 'Apple TV', mark: true, appId: 'com.samsung.tv.aria-video' },
     { id: 'stremio', name: 'Stremio', mark: true, appId: 'IkWsFHtOY9.Stremio' },
     { id: 'netflix', name: 'Netflix', mark: true, appId: 'org.tizen.netflix-app' },
     { id: 'disneyplus', name: 'Disney+', mark: true, appId: 'MCmYXNxgcu.DisneyPlus' },
     { id: 'youtube', name: 'YouTube', mark: true, appId: '9Ur5IzDKqV.TizenYouTube' },
-    { id: 'appletv', name: 'Apple TV', mark: true, appId: 'com.samsung.tv.aria-video' },
     { id: 'primevideo', name: 'Prime Video', mark: true, appId: 'org.tizen.primevideo' },
     { id: 'abciview', name: 'ABC iview', mark: true, appId: 'mWK87Xghap.ABCiview' },
     { id: 'sbs', name: 'SBS On Demand', mark: true, appId: 'OyE7OuxlUi.SBSOnDemand' },
     { id: 'applemusic', name: 'Apple Music', mark: true, appId: 'org.tizen.apple.apple-music' }
   ];
-  var PRIMARY = PRIMARY_APPS.map(function (a) { return a.id; }), APPS = PRIMARY_APPS.slice(), ALPHA = [];
+  /* Oliver fork: HDMI shortcuts for his own boxes. These are not Tizen apps and
+     have no launchable app ID, so they must never be sent to launchApp. A tile
+     opens the TV's real Inputs chooser the first time so Oliver can pick the
+     port; the choice is then remembered per tile (see launch() and detailOk).
+     No port numbers are assumed here: nothing is mapped until Oliver picks it
+     on the TV. Apple TV 4K reuses the Apple TV brand mark; PS5 and Sky use
+     monogram tiles because no brand mark is bundled for them. */
+  var HDMI_APPS = [
+    { id: 'hdmi-appletv', name: 'Apple TV 4K', mark: true, brand: 'appletv', appId: 'hdmi-appletv', hdmi: true, photo: 'assets/devices/appletv-4k.png' },
+    { id: 'hdmi-ps5', name: 'PS5', mark: false, appId: 'hdmi-ps5', hdmi: true, photo: 'assets/devices/ps5-slim.png' },
+    { id: 'hdmi-sky', name: 'Sky', mark: false, appId: 'hdmi-sky', hdmi: true, photo: 'assets/devices/sky-q.png' }
+  ];
+  var HDMI_IDS = HDMI_APPS.map(function (a) { return a.id; });
+  var OLIVER_HOME = ['hdmi-appletv', 'hdmi-ps5', 'hdmi-sky'];
+  var PRIMARY = PRIMARY_APPS.map(function (a) { return a.id; }), APPS = PRIMARY_APPS.concat(HDMI_APPS), ALPHA = [];
   var WALLS = window.CleanFrameWallpapers || [{ id: 'misty', name: 'Misty coast', tone: 'light', ut: { tr: 'mist', br: 'mist' }, frostVeil: .20 }];
   var ADAPTIVE_INK = window.CleanFrameAdaptiveInk || {};
   WALLS.forEach(function (w) { w.ut = w.ut || { tr: 'light', br: 'light' }; w.frostVeil = w.frostVeil || .12; });
@@ -44,9 +58,39 @@
     newsreader: { name: 'Newsreader', family: 'Study Newsreader', display: 400, ui: 400, clock: 400 }
   };
   var PRIVATE_FONTS = window.CleanFramePrivateFontIDs || [], fontMetrics = {}, unavailableFonts = {}, widthCache = {}, fontRevision = 0, fontsReady = false;
-  var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'] };
-  var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', focus: 'Focus', material: 'Material' };
-  var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text' };
+  /* Oliver fork: switchable themes. One build, five presets; a preset is a
+     named bundle of look values plus a stage class (th-<id>) for the CSS the
+     look axes cannot express. Applying one is a single setLook() call, so it
+     saves atomically like any other appearance change, and the last-applied
+     preset id is stored in S.c.preset. 'oliver' is not a preset: it is the
+     fallback for saved profiles from before themes existed, and Settings
+     shows those as Custom. */
+  var PRESET_IDS = ['minimal', 'devices', 'future', 'retro', 'art'];
+  var PRESETS = {
+    minimal: { name: 'Minimal Black & White', look: { bg: 'dark', layout: 'dock', apps: 'text', controls: 'text', font: 'manrope', focus: 'type', material: 'soft' } },
+    devices: { name: 'Device Photos', look: { bg: 'dark', layout: 'dock', apps: 'both', controls: 'both', font: 'manrope', focus: 'glass', material: 'soft' } },
+    future: { name: 'Futuristic', look: { bg: 'dark', layout: 'dock', apps: 'both', controls: 'both', font: 'manrope', focus: 'glass', material: 'frost' } },
+    retro: { name: '90s TV', look: { bg: 'dark', layout: 'dock', apps: 'both', controls: 'both', font: 'manrope', focus: 'glass', material: 'soft' } },
+    art: { name: 'Art Mode Overlay', look: { bg: 'photo', wall: 'jfk-diner', layout: 'dock', apps: 'both', controls: 'both', font: 'manrope', focus: 'glass', material: 'soft' } }
+  };
+  /* The Art theme wants the JFK diner photo first; on a clone without the
+     local-only wallpapers installed it falls back to the current wallpaper
+     instead of failing the whole theme change. */
+  function presetLook(id) {
+    var p = PRESETS[id], look = {}, k;
+    if (!p) return look;
+    for (k in p.look) if (p.look.hasOwnProperty(k)) look[k] = p.look[k];
+    if (look.wall && !wall(look.wall)) delete look.wall;
+    return look;
+  }
+  function applyPreset(id) {
+    var patch = presetLook(id);
+    patch.preset = id;
+    setLook(patch, { row: 'preset' });
+  }
+  var LOOK_VALUES = { bg: ['dark', 'light', 'photo'], layout: ['list', 'dock'], apps: ['icons', 'both', 'text'], font: Object.keys(FONTS).filter(function (id) { return id === 'manrope' || PRIVATE_FONTS.indexOf(id) >= 0; }), controls: ['icons', 'both', 'text'], focus: ['type', 'glass'], material: ['soft', 'frost', 'tint'], preset: PRESET_IDS };
+  var LOOK_NAMES = { bg: 'Background', layout: 'Layout', apps: 'Apps', font: 'Font', controls: 'Home controls', focus: 'Focus', material: 'Material', preset: 'Theme' };
+  var VALUE_NAMES = { dark: 'Dark', light: 'Light', photo: 'Photo', list: 'List', dock: 'Dock', type: 'Type', glass: 'Glass', soft: 'Soft', frost: 'Frost', tint: 'Clear tint', icons: 'Icons', both: 'Icons and text', text: 'Text', minimal: 'Minimal Black & White', devices: 'Device Photos', future: 'Futuristic', retro: '90s TV', art: 'Art Mode Overlay' };
   var UTIL = { art: ['Art Mode', 'art'], apps: ['All apps', 'apps'], arrange: ['Arrange', 'arrange'], settings: ['Settings', 'settings'] };
   var MSG = {
     leave: { title: 'Leave Home?', line: 'Open Samsung Home?', note: '', actions: [['stay', 'Stay'], ['samsung', 'Samsung Home']] }
@@ -138,6 +182,11 @@
       + (maskSupport ? '<span class="mk" style="' + st + ';-webkit-mask-image:url(' + ICONS + id + '.svg);mask-image:url(' + ICONS + id + '.svg)"></span>' : '<img alt="" src="' + ICONS + id + '.svg" style="' + st + '">') + '</span>';
   }
   function appMark(a, w, h, size) {
+    /* Device Photos theme: the tile shows a transparent photo of the actual
+       box instead of a mark. If the local-only PNG is missing, the image is
+       removed and the tile falls back to its label alone; nothing here ever
+       blocks navigation. */
+    if (S.c.preset === 'devices' && a.photo) return '<span class="mark device-photo" style="width:' + w + 'px;height:' + h + 'px"><img src="' + esc(a.photo) + '" alt="" onerror="this.remove()"></span>';
     if (a.mark && (maskSupport || S.c.bg !== 'light')) return markHtml(a.brand || a.id, w, h, size);
     var words = a.name.split(/\s+/), letters = words[0].charAt(0) + (words.length > 1 ? words[1].charAt(0) : '');
     return '<span class="mark monogram' + (a.icon ? ' native-icon' : '') + '" style="width:' + w + 'px;height:' + h + 'px;font-size:' + Math.round(size * .65) + 'px"><span>' + esc(letters.toUpperCase()) + '</span>'
@@ -326,6 +375,25 @@
     }
     return null;
   }
+  /* HDMI port map: shortcut id -> HDMI port number, remembered when Oliver
+     picks a port in the Inputs chooser. Only known shortcut ids and whole
+     port numbers 0-9 are kept; anything else is dropped, never guessed. */
+  function copyHdmi(map) {
+    var out = {}, k;
+    if (map && typeof map === 'object') for (k in map) if (map.hasOwnProperty(k) && HDMI_IDS.indexOf(k) >= 0 && typeof map[k] === 'number' && map[k] >= 0 && map[k] <= 9 && Math.floor(map[k]) === map[k]) out[k] = map[k];
+    return out;
+  }
+  /* A saved profile from before themes existed has no preset id. If its
+     look is exactly one preset's look, say so; otherwise it is Custom. */
+  function inferPreset(c) {
+    var i, j, look, keys, match;
+    for (i = 0; i < PRESET_IDS.length; i++) {
+      look = presetLook(PRESET_IDS[i]); keys = Object.keys(look); match = true;
+      for (j = 0; j < keys.length; j++) if (c[keys[j]] !== look[keys[j]]) { match = false; break; }
+      if (match) return PRESET_IDS[i];
+    }
+    return 'oliver';
+  }
   function clean(saved) {
     var s = saved && typeof saved === 'object' ? saved : {}, modern = s.look && typeof s.look === 'object' ? s.look : s;
     var legacyList = s.theme === 'list', h = [], recent = [], records = Array.isArray(s.appRecords) ? s.appRecords : [];
@@ -338,16 +406,20 @@
       if (!app(id) && id.indexOf('.') > 0) APPS.push({ id: id, appId: id, name: id.split('.').pop(), mark: false });
       if (app(id)) h.push(id);
     });
-    if (!h.length) h = PRIMARY.slice();
+    if (!h.length) h = OLIVER_HOME.slice();
     (Array.isArray(s.recent) ? s.recent : []).forEach(function (id) { if (safeId(id) && app(id) && h.indexOf(id) < 0 && recent.indexOf(id) < 0 && recent.length < 5) recent.push(id); });
-    return {
+    var out = {
       bg: pick(modern.bg, LOOK_VALUES.bg, legacyList ? 'dark' : 'photo'), layout: pick(modern.layout, LOOK_VALUES.layout, legacyList ? 'list' : 'dock'),
       apps: pick(modern.apps, LOOK_VALUES.apps, legacyList ? 'text' : 'both'), controls: pick(modern.controls, LOOK_VALUES.controls, 'both'),
       focus: pick(modern.focus, LOOK_VALUES.focus, legacyList ? 'type' : 'glass'), material: pick(modern.material, LOOK_VALUES.material, 'soft'),
       font: pick(modern.font, LOOK_VALUES.font, 'manrope'), wall: wall(modern.wall || s.wallpaper) ? modern.wall || s.wallpaper : WALLS[0].id,
       home: h, recent: recent, lastApp: h.indexOf(s.lastApp) >= 0 ? s.lastApp : h[0],
-      mode: pick(s.mode, MODES.map(function (m) { return m.id; }), 'fixed')
+      mode: pick(s.mode, MODES.map(function (m) { return m.id; }), 'fixed'),
+      preset: pick(s.preset, PRESET_IDS, 'oliver'),
+      hdmi: copyHdmi(s.hdmi)
     };
+    if (!s.preset) out.preset = inferPreset(out);
+    return out;
   }
   function serialise(c) {
     var out = {};
@@ -362,7 +434,15 @@
     return out;
   }
   function initialise() {
-    var saved = load(), initial; S.c = clean(saved); initial = next(S.c.home.slice(), S.c.recent.slice());
+    var saved = load(), initial, p; S.c = clean(saved);
+    // Oliver fork, fresh install only: the Minimal Black & White theme
+    // (quiet dark Dock, text-only tiles). The wallpaper stays the first
+    // gallery entry (JFK at the diner once the local wallpapers are
+    // installed), so switching Background to Photo, or Theme to Art Mode
+    // Overlay, shows his art first. Saved and legacy preferences are never
+    // overridden here.
+    if (!saved) { p = presetLook('minimal'); Object.keys(p).forEach(function (k) { S.c[k] = p[k]; }); S.c.preset = 'minimal'; }
+    initial = next(S.c.home.slice(), S.c.recent.slice());
     S.stack = [{ id: 'home', f: { zone: 'apps', u: 0 } }];
     S.sel = S.c.lastApp; S.selIdx = S.c.home.indexOf(S.sel);
     if (saved && initial.mode === 'open') initial.wall = WALLS[(wallIndex(initial.wall) + 1) % WALLS.length].id;
@@ -371,7 +451,7 @@
   }
   function clearSession() { S.undo = []; S.removedAt = {}; S.note = null; S.err = null; }
   function begin() { S.note = null; }
-  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; return c; }
+  function next(home, recent) { var c = lookOf(S.c); c.home = home; c.recent = recent; c.lastApp = S.c.lastApp; c.mode = S.c.mode; c.preset = S.c.preset; c.hdmi = copyHdmi(S.c.hdmi); return c; }
   function snap() { return { home: S.c.home.slice(), recent: S.c.recent.slice() }; }
   function pushRecent(list, id) { return [id].concat(without(list, id)).slice(0, 5); }
   function write(c, label) {
@@ -457,8 +537,22 @@
     });
   }
   function launch(id) {
-    var a = app(id), c;
+    var a = app(id), c, port;
     if (!a || busy) return;
+    if (a.hdmi) {
+      if (S.c.home.indexOf(id) >= 0) { c = next(S.c.home.slice(), S.c.recent.slice()); c.lastApp = id; write(c, 'Last app'); }
+      port = S.c.hdmi ? S.c.hdmi[id] : undefined;
+      if (typeof port === 'number') {
+        S.press = id; S.lastLaunch = a.name;
+        perform(a.name, function (done) { FrameDevice.setSource(port, done); });
+      } else {
+        // No port mapped yet: open the TV's real Inputs chooser so Oliver
+        // picks the HDMI port once. The choice is remembered for this tile
+        // (see detailOk). Nothing is assumed about which port is which.
+        openInputsForHdmi(id);
+      }
+      return;
+    }
     if (S.c.home.indexOf(id) >= 0) { c = next(S.c.home.slice(), S.c.recent.slice()); c.lastApp = id; write(c, 'Last app'); }
     S.press = id; S.lastLaunch = a.name;
     perform(a.name, function (done) { FrameDevice.launchApp(a.appId, done); });
@@ -816,7 +910,8 @@
   function mode() { for (var i = 0; i < MODES.length; i++) if (MODES[i].id === S.c.mode) return MODES[i]; return MODES[0]; }
   function settingsRows() {
     var n = S.c.home.length;
-    return [{ id: 'background', label: 'Background', value: S.c.bg === 'photo' ? wall(S.c.wall).name : VALUE_NAMES[S.c.bg] },
+    return [{ id: 'theme', label: 'Theme', value: PRESETS[S.c.preset] ? PRESETS[S.c.preset].name : 'Custom' },
+      { id: 'background', label: 'Background', value: S.c.bg === 'photo' ? wall(S.c.wall).name : VALUE_NAMES[S.c.bg] },
       { id: 'layout', label: 'Layout', value: VALUE_NAMES[S.c.layout] },
       { id: 'typography', label: 'Typography', value: FONTS[S.c.font].name },
       { id: 'focus', label: 'Focus', value: VALUE_NAMES[S.c.focus] + (materialApplies() ? ', ' + VALUE_NAMES[S.c.material] : '') },
@@ -841,7 +936,7 @@
     if (id === 'editor') openEditor('settings');
     else openAppearance(id);
   }
-  var DETAIL_NAMES = { background: 'Background', layout: 'Layout', typography: 'Typography', focus: 'Focus', rotation: 'Rotation', samsung: 'Samsung', inputs: 'Inputs' };
+  var DETAIL_NAMES = { theme: 'Theme', background: 'Background', layout: 'Layout', typography: 'Typography', focus: 'Focus', rotation: 'Rotation', samsung: 'Samsung', inputs: 'Inputs' };
   function choice(axis, value, disabled) {
     return { action: axis === 'mode' ? 'rotation.' + value : 'choice.' + axis + '.' + value, axis: axis, value: value, disabled: !!disabled,
       label: axis === 'font' ? FONTS[value].name : axis === 'mode' ? MODES.filter(function (m) { return m.id === value; })[0].name : value === 'both' ? 'Both' : VALUE_NAMES[value] };
@@ -852,7 +947,9 @@
     if (t.group === 'inputs') return [{ id: 'inputs', title: '', items: t.inputs.length ? t.inputs.map(function (input) {
       return { action: 'input.' + input.number, label: input.name, description: input.active ? 'Active' : input.connected ? 'Connected' : 'Disconnected — may be asleep' };
     }) : [{ action: 'inputs.retry', label: t.loading ? 'Loading inputs…' : 'Try again', disabled: t.loading }],
-      reason: t.inputError || (!t.loading && !t.inputs.length ? 'No HDMI inputs were reported by this TV.' : '') }];
+      reason: t.inputError || (t.mapHdmi && app(t.mapHdmi) ? 'Choose the HDMI port for ' + app(t.mapHdmi).name + '. It will be remembered for this tile.' : '') || (!t.loading && !t.inputs.length ? 'No HDMI inputs were reported by this TV.' : '') }];
+    if (t.group === 'theme') return [{ id: 'preset', title: 'Theme', items: options('preset', PRESET_IDS),
+      reason: 'One tap changes the whole look. Your own Background, Layout and Focus choices are kept if you change them afterwards.' }];
     if (t.group === 'background') return [
       { id: 'bg', title: 'Background type', items: options('bg', ['photo', 'light', 'dark']) },
       { id: 'wall', title: 'Wallpaper', items: [{ action: 'background.wallpaper', label: wall(S.c.wall).name, thumbnail: true, disabled: flat }] },
@@ -916,6 +1013,9 @@
   function openInputs() {
     openAppearance('inputs'); var t = top(); t.inputs = []; loadInputs(t);
   }
+  function openInputsForHdmi(id) {
+    openInputs(); var t = top(); t.mapHdmi = id;
+  }
   function detailBack() { cancelLook(); S.err = null; pop(); FrameDevice.cancelSource(); }
   function detailOk(t, item) {
     var patch = {}, error = S.lookError;
@@ -926,6 +1026,7 @@
       if (error && error.row === 'mode') applyRotation(error.patch.mode);
       else if (error) setLook(error.patch, { row: error.row });
     } else if (item.axis === 'mode') applyRotation(item.value);
+    else if (item.axis === 'preset') applyPreset(item.value);
     else if (item.axis) { patch[item.axis] = item.value; setLook(patch, { row: item.axis }); }
     else if (item.action === 'background.wallpaper') openWallpaper();
     else if (item.action === 'background.rotation') openAppearance('rotation');
@@ -934,8 +1035,14 @@
     else if (item.action === 'samsung.inputs') openInputs();
     else if (item.action === 'inputs.retry') loadInputs(t);
     else if (item.action.indexOf('input.') === 0) perform(item.label, function (done) {
-      FrameDevice.setSource(Number(item.action.slice(6)), function (err) {
+      var port = Number(item.action.slice(6)), mapId = t.mapHdmi;
+      FrameDevice.setSource(port, function (err) {
         t.refreshInputs = true;
+        if (!err && mapId && app(mapId) && app(mapId).hdmi) {
+          var c = next(S.c.home.slice(), S.c.recent.slice());
+          c.hdmi = copyHdmi(S.c.hdmi); c.hdmi[mapId] = port;
+          if (write(c, 'Remember ' + app(mapId).name + ' on HDMI ' + port)) t.mapHdmi = null;
+        }
         done(top() === t && !document.hidden && !(err && err.cancelled) ? err : null);
       });
     });
@@ -943,7 +1050,7 @@
   V.appearance = {
     norm: function (t) {
       var rows = detailRows(t), exists = false, applied = null;
-      var axis = { background: 'bg', layout: 'layout', typography: 'font', focus: 'focus', rotation: 'mode' }[t.group];
+      var axis = { theme: 'preset', background: 'bg', layout: 'layout', typography: 'font', focus: 'focus', rotation: 'mode' }[t.group];
       rows.forEach(function (items) { items.forEach(function (item) {
         if (item.action === t.f.action) exists = true;
         if (item.axis === axis && item.value === S.c[axis]) applied = item;
@@ -1041,7 +1148,7 @@
   function render() {
     var t = top(), sheet = !!V[t.id].sheet, shown = wall(S.shown ? S.shown.wall : S.c.wall), palette = ADAPTIVE_INK[shown.id];
     var adaptive = applyAdaptiveInk(palette), tr = adaptive && palette.tr ? palette.tr.pol : shown.ut.tr, br = adaptive && palette.br ? palette.br.pol : shown.ut.br;
-    stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + shown.tone + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '');
+    stage.className = 'stage bg-' + S.c.bg + ' l-' + S.c.layout + ' v-' + S.variant + ' m-' + (materialApplies() ? S.c.material : 'none') + ' f-' + S.c.focus + ' a-' + S.c.apps + ' u-' + S.c.controls + ' g-' + S.geom + ' tone-' + shown.tone + ' tr-' + tr + ' br-' + br + wallClasses(shown) + inkRungClasses(palette, adaptive) + ' at-' + t.id + ' font-' + homeFont() + (homeFont() !== 'manrope' ? ' font-custom' : '') + (S.fontSwitch ? ' is-font-switch' : '') + (adaptive ? ' has-adaptive-ink adaptive-tl-' + palette.tl.pol : '') + (!adaptive && shown.clockInk ? ' has-clock-ink' : '') + (!adaptive && shown.dockClockInk ? ' has-dock-clock-ink' : '') + (registeredMaterial(shown.id) ? ' registered-material' : '') + (sheet ? ' is-sheet' : '') + (S.reflow ? ' is-reflow' : '') + ' th-' + S.c.preset;
     if (!adaptive && shown.clockInk) stage.style.setProperty('--clock-ink', shown.clockInk);
     else stage.style.removeProperty('--clock-ink');
     if (!adaptive && shown.dockClockInk) stage.style.setProperty('--dock-clock-ink', shown.dockClockInk);
@@ -1079,7 +1186,8 @@
   }
 
   function clockText() {
-    var d = new Date(), h = d.getHours() % 12 || 12, m = d.getMinutes();
+    // Oliver fork: 24-hour clock (UK). Upstream used 12-hour here.
+    var d = new Date(), h = d.getHours(), m = d.getMinutes();
     return h + ':' + (m < 10 ? '0' : '') + m;
   }
   function clockHtml() {
@@ -1246,7 +1354,7 @@
     keyed(track, empty ? [] : items, function (el, it, i) {
       var a = it.id ? app(it.id) : null, left = i * g.pitch, focus = tileFocus && i === anchor, sel = tileSel && i === anchor;
       var lifted = hs.lifted && i === anchor, partial = g.broad && (left - off < -1 || left + g.tw - off > g.shelf + 1);
-      setContent(el, it.kind + '|' + (it.id || '') + '|' + (it.id ? dockLabelSize(it.id) : full) + '|' + S.c.bg + '|' + S.c.apps + '|' + homeFont(), function () { return '<span class="tile-content">' + dockTileHtml(it, full) + '</span>'; });
+      setContent(el, it.kind + '|' + (it.id || '') + '|' + (it.id ? dockLabelSize(it.id) : full) + '|' + S.c.bg + '|' + S.c.apps + '|' + S.c.preset + '|' + homeFont(), function () { return '<span class="tile-content">' + dockTileHtml(it, full) + '</span>'; });
       el.className = 'tile k-' + it.kind + (focus ? ' is-focus' : '') + (sel ? ' is-sel' : '') + (lifted ? ' is-lifted' : '') + (partial ? ' is-partial' : '')
         + (a && !a.mark ? ' is-text' : '') + (it.kind === 'add' && full ? ' is-full' : '') + (it.kind === 'app' && S.press === it.id ? ' is-press' : '')
         + (lifted && i === 0 ? ' no-l' : '') + (lifted && i >= ns - 1 ? ' no-r' : '');
@@ -1348,7 +1456,7 @@
     phRows.style.top = (compact ? 72 : 148) + 'px';
     keyed(phRows, items, function (row, it, i) {
       var typography = photoLabel(it.id, compact), focus = rowFocus && i === anchor, lifted = hs.lifted && i === anchor, markImage, body = '';
-      setContent(row, it.id + '|' + typography.size + '|' + S.c.bg + '|' + S.c.apps + '|' + homeFont(), function () {
+      setContent(row, it.id + '|' + typography.size + '|' + S.c.bg + '|' + S.c.apps + '|' + S.c.preset + '|' + homeFont(), function () {
         if (S.c.apps !== 'text') body += appMark(app(it.id), S.c.apps === 'icons' ? compact ? 64 : 88 : compact ? 60 : 84, S.c.apps === 'icons' ? compact ? 64 : 88 : compact ? 44 : 64, S.c.apps === 'icons' ? compact ? 52 : 72 : compact ? 42 : 54);
         if (S.c.apps !== 'icons') body += '<span class="ph-name" style="font-size:' + typography.size + 'px;top:' + typography.top + 'px">' + esc(app(it.id).name) + '</span>';
         return '<span class="ph-group">' + body + '</span><span class="ph-move ph-move-up">' + icon('up') + '</span><span class="ph-move ph-move-down">' + icon('down') + '</span>';
@@ -1556,7 +1664,7 @@
       t.top = clamp(t.top, 0, Math.max(0, rows - vis));
       keyed(el.grid, items.map(function (id) { return { key: id, id: id }; }), function (tile, it, i) {
         var focus = f.zone === 'grid' && i === f.i;
-        setContent(tile, [it.id, app(it.id).name, onHome(it.id)].join('|'), function () { return gridTileHtml(it.id); });
+        setContent(tile, [it.id, app(it.id).name, onHome(it.id), S.c.preset].join('|'), function () { return gridTileHtml(it.id); });
         tile.className = 'gt' + (focus ? ' is-focus' : '');
         tile.style.transform = 'translate3d(' + ((i % COLS) * GRID_COL) + 'px,' + (Math.floor(i / COLS) * GRID_ROW) + 'px,0)';
         tile.setAttribute('role', 'button'); tile.setAttribute('aria-label', app(it.id).name);
@@ -1580,7 +1688,7 @@
 
       keyed(el.home, H.map(function (id) { return { key: id, id: id }; }), function (row, it, i) {
         var a = app(it.id), here = f.zone === 'home' && i === f.i, lifted = !!t.lifted && i === f.i;
-        setContent(row, it.id, function () { return '<div class="er-name" role="button"><span class="panel-content"><span class="er-num"></span>' + smallMark(a) + '<span class="er-text">' + esc(a.name) + '</span><span class="er-move">' + icon('updown') + '</span></span></div><div class="er-rm" role="button"><span></span></div>'; });
+        setContent(row, it.id + '|' + S.c.preset, function () { return '<div class="er-name" role="button"><span class="panel-content"><span class="er-num"></span>' + smallMark(a) + '<span class="er-text">' + esc(a.name) + '</span><span class="er-move">' + icon('updown') + '</span></span></div><div class="er-rm" role="button"><span></span></div>'; });
         row.className = 'er' + (here ? ' is-active' : '') + (lifted ? ' is-lifted' : '');
         row.style.transform = 'translate3d(' + (lifted ? 16 : 0) + 'px,' + editorHomeY(i) + 'px,0)';
         row.querySelector('.er-num').textContent = String(i + 1);

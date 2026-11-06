@@ -6,6 +6,8 @@ A quieter home screen for Samsung The Frame. Your apps, a photograph and the tim
 
 I built CleanFrame for one TV: my own Samsung The Frame, running Tizen. I'm sharing the code and setup notes as a starting point for other people to build on.
 
+> **Oliver's fork.** This checkout is Oliver Birch's fork (`0liverBirch/CleanFrame65`, branch `oliver-launcher`). It keeps the upstream behaviour except for the changes listed in `OLIVER-HANDOVER.md`: a 24-hour clock, a fresh-install Dock of HDMI shortcuts for his Apple TV 4K, PS5 and Sky boxes (ports are picked on the TV and remembered, never assumed), five switchable themes in Settings (the fresh-install default is Minimal Black & White), and four of his own Frame-art photos as local-only wallpapers. His photos and signing certificates are never committed to this public fork; the wallpapers and device photos are installed locally with `python3 scripts/apply-oliver-assets.py` from the gitignored `.local/oliver-wallpapers/` and `.local/oliver-devices/` folders.
+
 **Use it at your own risk.** The web launcher targets Tizen 5.0 and later for installation, with [owner reports](docs/compatibility.md) across several models. That minimum is not a promise that every device flow is verified. The TV setup scripts and native Home helpers still reflect specific computers and firmware, so adapt them and test on your own hardware.
 
 I highly recommend forking it and building on top of it, ideally with a coding agent that can help you understand and adapt the setup. Start with the browser preview, make the interface your own, then work through TV installation when you're ready. Native Home/startup changes need particular care; the setup guide covers the risks and recovery steps.
@@ -28,7 +30,7 @@ The public preview uses the included Manrope, Geist and Newsreader fonts.
 ## What you can change
 
 - Choose a List or Dock layout, with icons, names or both.
-- Use a photograph, light or dark background, with a simple 12-hour clock.
+- Use a photograph, light or dark background, with a simple 24-hour clock.
 - Adjust typography, focus and glass materials through the same Settings interface.
 - Choose and reorder Home apps; discover installed apps on the TV.
 - Select from fifteen wallpapers and save your preferences locally.

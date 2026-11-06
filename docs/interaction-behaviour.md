@@ -89,9 +89,60 @@ Launcher wallpaper is separate from native Art Mode. Runtime photos, materials a
 
 The native Home operation and startup configuration from 19 October remain separate from this app update. Home from Netflix was confirmed for that configuration; power-on after Netflix remains provisional. Streaming apps retain their own Back navigation. Netflix did not exit on repeated Back in the observed test, so there was no app-exit destination to verify. No global Back interception or key-filter hook was installed. See [TV status](tv-status.md) for device evidence; this behaviour specification is not an installation or visual-verification record for 0.6.0.
 
+## Themes (Oliver fork)
+
+Settings has a Theme group, first in the list, with five presets in one
+build: Minimal Black & White, Device Photos, Futuristic, 90s TV and Art Mode
+Overlay. Choosing one applies its whole look (background, layout, app and
+control display, font, focus style, material and, for Art Mode Overlay, the
+JFK diner wallpaper) in a single save, and the last-applied preset is kept in
+saved preferences (`preset` in `cleanframe.home.v1`). A fresh install starts
+on Minimal Black & White: dark Dock, text-only tiles, no photo wallpaper.
+Changing Background, Layout or Focus afterwards keeps working exactly as
+before; it does not clear the stored preset, so Settings keeps showing the
+last theme chosen. Saved profiles from before themes existed have no preset
+and show as Custom.
+
+- Minimal Black & White is monochrome only: dark background, text-only
+  tiles, a plain white focus outline instead of a glass plate.
+- Device Photos shows a transparent photo of the actual box on each Home
+  tile (Apple TV 4K + remote, PS5 Slim + controller, Sky Q box) on a plain
+  dark background. The PNGs are local-only, installed by
+  `scripts/apply-oliver-assets.py` from `.local/oliver-devices/`; if they
+  are missing, the tiles fall back to their labels and navigation is
+  unaffected.
+- Futuristic is a static neon/glass look: a dark gradient background, cyan
+  focus plate and clock glow. No live blur, no animation.
+- 90s TV is a retro CRT/VHS look: bright magenta, teal and yellow, chunky
+  focus borders, uppercase labels and a static scanline overlay. The type
+  stays the bundled sans (a pixel font would break the measured label
+  geometry), so the retro feel comes from colour, borders and scanlines.
+- Art Mode Overlay fills the screen with the JFK diner photo (or the
+  current wallpaper if the local-only photos are not installed) and puts the
+  launcher on top as a minimal overlay: unfocused tiles dim so the photo
+  reads as art when idle.
+
+Theme styling is static CSS under the `th-<preset>` stage class; it never
+uses live blur or backdrop filters, and it does not change tile geometry, so
+remote navigation and the browser checks are unaffected.
+
+## HDMI shortcuts (Oliver fork)
+
+Home can hold three HDMI shortcut tiles — Apple TV 4K, PS5 and Sky — in that
+order on a fresh install. They are not Tizen apps and have no launchable app
+ID, so they are never sent to `launchApp`. A tile with no remembered port
+opens Settings → Samsung → Inputs, the TV's real input chooser, and says
+which device it is for. Choosing a port there switches to it and remembers
+the port for that tile in saved preferences (`hdmi` in `cleanframe.home.v1`).
+A tile with a remembered port switches straight to it with `setSource`. No
+port numbers are assumed anywhere: until Oliver picks a port on the TV,
+nothing is mapped. If a tile is removed from Home it appears under Recently
+removed in the editor and can be added back from there. The Samsung Apple TV
+app is still available in All apps; the Home tile is the Apple TV 4K box.
+
 ## Clock and rendering
 
-Both layouts show the TV's local time in 12-hour format, without AM/PM or seconds. It updates at the minute boundary and on return to the launcher. No date or clock panel is shown.
+Both layouts show the TV's local time in 24-hour format, without seconds. It updates at the minute boundary and on return to the launcher. No date or clock panel is shown.
 
 Photographic materials and blurred panel backgrounds are generated before packaging and stay aligned with the full-screen image. Photo colour and contrast metadata are also prepared offline. Navigation does not sample image pixels, run an optics engine or apply live backdrop blur. Flat backgrounds use matching light or dark panel colours. Focus feedback uses transforms and opacity; reduced motion removes animated scaling and movement while retaining opacity feedback.
 

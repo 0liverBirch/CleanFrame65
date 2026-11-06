@@ -633,3 +633,33 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .l-list .quiet-utils.is-text .u-content>*+*{margin-left:0;margin-right:0}
 .quiet-utils.is-text .u-content>*+*{margin-left:0}
 .l-list .quiet-utils.is-text .u .u-content>*+*{margin-right:0}
+
+/* ---------- Themes (Oliver fork) ----------
+   One build, five presets. Each rule is scoped under the stage class
+   th-<preset> that render() appends; th-oliver (pre-theme profiles) has no
+   overrides. No live blur, no backdrop-filter, no animation: everything
+   here is static paint, so the TV stays fast. */
+/* Type focus hides the dock plate upstream (.f-type .plate{opacity:0}), so
+   the Minimal theme draws its focus ring on the tile itself instead. */
+.th-minimal .tile.is-focus{box-shadow:inset 0 0 0 2px rgba(255,255,255,.9)}
+.th-minimal .mat::after{box-shadow:none}
+.th-minimal .mat-veil{background:rgba(8,14,18,.30)}
+.th-minimal .tile .mark,.th-minimal .tile .label{opacity:.92}
+.th-devices{background:#0d1113}
+.th-devices .tile .mark{left:24px!important;top:10px!important;width:240px!important;height:108px!important}
+.th-devices .device-photo img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
+.th-future{background:linear-gradient(160deg,#0b1c26 0%,#101b2e 55%,#160f2e 100%)}
+.th-future{--solid:#8ef1ff;--solid-ink:#06222b;--plate:linear-gradient(170deg,rgba(0,229,255,.34),rgba(0,229,255,.12) 58%,rgba(0,229,255,.20));--plate-edge:inset 0 1px 0 rgba(140,240,255,.5)}
+.th-future .plate.on-focus{box-shadow:0 0 28px rgba(0,229,255,.28),var(--plate-edge)}
+.th-future .clock{color:#d8f7ff;text-shadow:0 0 18px rgba(0,229,255,.45),0 1px 3px rgba(0,0,0,.22)}
+.th-future .tile .label{color:#e8fbff}
+.th-retro{background:#14101e}
+.th-retro{--solid:#ffd500;--solid-ink:#14101e}
+.th-retro .plate.on-focus{background:linear-gradient(170deg,#ff2e88,#7a2eff);box-shadow:0 0 0 4px #00e5d4}
+.th-retro .tile .label,.th-retro .ph-name{text-transform:uppercase;letter-spacing:.5px}
+.th-retro .clock{color:#00e5d4;text-shadow:3px 3px 0 #ff2e88}
+.th-retro .quiet-utils .u{color:#ffd500}
+.th-retro::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;box-shadow:inset 0 0 0 10px #000,inset 0 0 0 14px #00b3a4;pointer-events:none;z-index:59}
+.th-retro::after{content:"";position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 2px,transparent 2px 4px);pointer-events:none;z-index:60}
+.th-art .mat-veil{background:rgba(8,14,18,.06)}
+.th-art .tile:not(.is-focus) .mark,.th-art .tile:not(.is-focus) .label{opacity:.55}

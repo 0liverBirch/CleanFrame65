@@ -43,3 +43,22 @@ PP*.woff2
 /explorations/
 /docs/research/
 /docs/articles/
+
+# Oliver's personal Frame art (JFK diner, Mustang, Superbird, Petty #43).
+# Prepared locally by scripts/apply-oliver-assets.py from .local/oliver-wallpapers/.
+# These files must never be committed: this fork is public, and committing them
+# would publish his personal photos. The copy-in script refuses to run if the
+# source folder is missing, and `npm run check:public` still passes with them
+# installed because git ignores them here.
+/app/assets/wallpapers/jfk-diner*.jpg
+/app/assets/wallpapers/mustang-villa*.jpg
+/app/assets/wallpapers/superbird-desert*.jpg
+/app/assets/wallpapers/petty-43*.jpg
+/app/assets/materials/jfk-diner-*.jpg
+/app/assets/materials/mustang-villa-*.jpg
+/app/assets/materials/superbird-desert-*.jpg
+/app/assets/materials/petty-43-*.jpg
+# Oliver's Device Photos (Apple TV 4K, PS5 Slim, Sky Q box): transparent PNGs
+# prepared locally by scripts/apply-oliver-assets.py from .local/oliver-devices/.
+# Same rule: local-only, never committed to the public fork.
+/app/assets/devices/*.png
