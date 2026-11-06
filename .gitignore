@@ -66,5 +66,6 @@ PP*.woff2
 # scripts/apply-oliver-assets.py from .local/oliver-backgrounds/.
 # Same rule: local-only, never committed to the public fork.
 /app/assets/devices/*.png
+/app/assets/devices/*.jpg
 /app/assets/theme-backgrounds/*.jpg
 /app/assets/theme-backgrounds/*.png

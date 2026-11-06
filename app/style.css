@@ -662,7 +662,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .th-devices{background:#0d1113}
 .th-devices .scene{background:#0d1113 url("assets/theme-backgrounds/devices-bg.jpg") center/cover no-repeat}
 .th-devices .tile .mark{left:30px!important;top:12px!important;width:340px!important;height:150px!important}
-.th-devices .device-photo img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
+.th-devices .device-photo img,.th-future .device-photo img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
+.th-future .tile .mark{left:30px!important;top:12px!important;width:340px!important;height:150px!important}
 .th-future{background:linear-gradient(160deg,#0b1c26 0%,#101b2e 55%,#160f2e 100%)}
 .th-future .scene{background:#101b2e url("assets/theme-backgrounds/future-bg.jpg") center/cover no-repeat}
 .th-future{--solid:#8ef1ff;--solid-ink:#06222b;--plate:linear-gradient(170deg,rgba(0,229,255,.34),rgba(0,229,255,.12) 58%,rgba(0,229,255,.20));--plate-edge:inset 0 1px 0 rgba(140,240,255,.5)}
@@ -703,3 +704,34 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .th-retro::after{content:"";position:absolute;left:0;top:0;width:1920px;height:1080px;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.45) 100%),linear-gradient(115deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.03) 18%,transparent 30%),repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,transparent 2px 3px);pointer-events:none;z-index:60}
 .th-art .mat-veil{background:rgba(8,14,18,.06)}
 .th-art .tile:not(.is-focus) .mark,.th-art .tile:not(.is-focus) .label{opacity:.55}
+/* ---------- Apple TV-style device cards (Oliver fork) ----------
+   tvOS home-screen language: a large rounded card whose artwork fills
+   the tile, the focused card lifting (scale + strong shadow + white
+   ring) while the others sit flatter and dimmer. Device Photos gets the
+   full treatment plus a subtle focus halo: the focused device's
+   pre-rendered backdrop on a separate .focus-bg layer under .bg/.home,
+   centred on the focused tile and faded to transparent at its edges by
+   a radial-gradient mask (instant swap, no animation), so the glow is
+   local to the card and the theme background shows through at the
+   edges. (A baked-alpha PNG halo would do the same job; the mask is
+   used because it needs no new image files, and this codebase already
+   uses -webkit-mask-image/mask-image for the shelf and list fades.)
+   Futuristic gets the same cards with a cyan lift, but keeps its
+   nebula background — a halo there would fight the theme. Art Mode
+   Overlay keeps its JFK photo as the background, so it gets only the
+   lift and shadow, no card art and no halo. Minimal stays text-only
+   and 90s TV keeps its bevelled plastic buttons; neither is touched
+   here. */
+.focus-bg{position:absolute;left:0;top:0;width:1600px;height:760px;background-size:cover;background-position:center;opacity:0;pointer-events:none;-webkit-mask-image:radial-gradient(ellipse 700px 330px at center,#000 0%,#000 45%,transparent 100%);mask-image:radial-gradient(ellipse 700px 330px at center,#000 0%,#000 45%,transparent 100%)}
+.focus-bg.is-on{opacity:1}
+.card-art{display:none;position:absolute;left:0;top:0;width:100%;height:100%;border-radius:inherit;background-size:cover;background-position:center}
+.th-devices .tile .card-art,.th-future .tile .card-art{display:block}
+.th-devices .tile,.th-future .tile{background:#0d1113}
+.th-devices .tile,.th-future .tile,.th-art .tile{transition:transform var(--t) var(--ease),box-shadow 160ms linear}
+.th-devices .tile:not(.is-focus) .tile-content,.th-future .tile:not(.is-focus) .tile-content{opacity:.62}
+.th-devices .tile.is-focus,.th-future .tile.is-focus,.th-art .tile.is-focus{z-index:2}
+.th-devices .tile.is-focus .tile-content,.th-future .tile.is-focus .tile-content{transform:scale(1.06)}
+.th-devices .tile.is-focus{box-shadow:0 24px 48px rgba(0,0,0,.6),0 0 0 3px rgba(255,255,255,.9)}
+.th-future .tile.is-focus{box-shadow:0 24px 48px rgba(0,0,0,.6),0 0 32px rgba(0,229,255,.35),0 0 0 3px rgba(142,241,255,.9)}
+.th-art .tile.is-focus .tile-content{transform:scale(1.05)}
+.th-art .tile.is-focus{box-shadow:0 20px 40px rgba(0,0,0,.5)}

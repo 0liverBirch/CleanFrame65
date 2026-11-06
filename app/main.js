@@ -32,9 +32,9 @@
      on the TV. Apple TV 4K reuses the Apple TV brand mark; PS5 and Sky use
      monogram tiles because no brand mark is bundled for them. */
   var HDMI_APPS = [
-    { id: 'hdmi-appletv', name: 'Apple TV 4K', mark: true, brand: 'appletv', appId: 'hdmi-appletv', hdmi: true, photo: 'assets/devices/appletv-4k.png' },
-    { id: 'hdmi-ps5', name: 'PS5', mark: false, appId: 'hdmi-ps5', hdmi: true, photo: 'assets/devices/ps5-slim.png' },
-    { id: 'hdmi-sky', name: 'Sky', mark: false, appId: 'hdmi-sky', hdmi: true, photo: 'assets/devices/sky-q.png' }
+    { id: 'hdmi-appletv', name: 'Apple TV 4K', mark: true, brand: 'appletv', appId: 'hdmi-appletv', hdmi: true, photo: 'assets/devices/appletv-4k.png', card: 'assets/devices/hdmi-appletv-card.jpg', focusBg: 'assets/theme-backgrounds/hdmi-appletv-focus.jpg' },
+    { id: 'hdmi-ps5', name: 'PS5', mark: false, appId: 'hdmi-ps5', hdmi: true, photo: 'assets/devices/ps5-slim.png', card: 'assets/devices/hdmi-ps5-card.jpg', focusBg: 'assets/theme-backgrounds/hdmi-ps5-focus.jpg' },
+    { id: 'hdmi-sky', name: 'Sky', mark: false, appId: 'hdmi-sky', hdmi: true, photo: 'assets/devices/sky-q.png', card: 'assets/devices/hdmi-sky-card.jpg', focusBg: 'assets/theme-backgrounds/hdmi-sky-focus.jpg' }
   ];
   var HDMI_IDS = HDMI_APPS.map(function (a) { return a.id; });
   var OLIVER_HOME = ['hdmi-appletv', 'hdmi-ps5', 'hdmi-sky'];
@@ -182,11 +182,12 @@
       + (maskSupport ? '<span class="mk" style="' + st + ';-webkit-mask-image:url(' + ICONS + id + '.svg);mask-image:url(' + ICONS + id + '.svg)"></span>' : '<img alt="" src="' + ICONS + id + '.svg" style="' + st + '">') + '</span>';
   }
   function appMark(a, w, h, size) {
-    /* Device Photos theme: the tile shows a transparent photo of the actual
-       box instead of a mark. If the local-only PNG is missing, the image is
-       removed and the tile falls back to its label alone; nothing here ever
-       blocks navigation. */
-    if (S.c.preset === 'devices' && a.photo) return '<span class="mark device-photo" style="width:' + w + 'px;height:' + h + 'px"><img src="' + esc(a.photo) + '" alt="" onerror="this.remove()"></span>';
+    /* Device Photos and Futuristic themes: the tile shows a transparent
+       photo of the actual box instead of a mark, sitting on the rich card
+       art (see dockTileHtml). If the local-only PNG is missing, the image
+       is removed and the tile falls back to its label alone; nothing here
+       ever blocks navigation. */
+    if ((S.c.preset === 'devices' || S.c.preset === 'future') && a.photo) return '<span class="mark device-photo" style="width:' + w + 'px;height:' + h + 'px"><img src="' + esc(a.photo) + '" alt="" onerror="this.remove()"></span>';
     if (a.mark && (maskSupport || S.c.bg !== 'light')) return markHtml(a.brand || a.id, w, h, size);
     var words = a.name.split(/\s+/), letters = words[0].charAt(0) + (words.length > 1 ? words[1].charAt(0) : '');
     return '<span class="mark monogram' + (a.icon ? ' native-icon' : '') + '" style="width:' + w + 'px;height:' + h + 'px;font-size:' + Math.round(size * .65) + 'px"><span>' + esc(letters.toUpperCase()) + '</span>'
@@ -1109,7 +1110,7 @@
   var utilFocusLabel = $('utilFocusLabel'), utilFocusKey = '', appFocusName = $('appFocusName');
   var dock = $('dock'), shelf = $('shelf'), track = $('track'), plate = $('plate'), matScrim = $('matScrim'), dockEmpty = $('dockEmpty');
   var cueL = $('cueL'), cueR = $('cueR'), dockAction = $('dockAction'), tonight = $('tonight');
-  var focusStatus = $('focusStatus'), sceneEl = $('scene'), appearanceEl = $('appearance'), appearanceRows = $('appearanceRows'), appearanceDesc = $('appearanceDesc');
+  var focusStatus = $('focusStatus'), sceneEl = $('scene'), focusBgEl = $('focusBg'), appearanceEl = $('appearance'), appearanceRows = $('appearanceRows'), appearanceDesc = $('appearanceDesc');
   var appearanceBack = $('appearanceBack'), appearanceTitle = $('appearanceTitle'), appearanceStatus = $('appearanceStatus');
   var phScene = $('phScene'), phPlate = $('phPlate'), phField = $('phField'), phList = $('phList'), phRows = $('phRows'), phAction = $('phAction'), phEmpty = $('phEmpty');
   var phPlates = [phPlate, $('phPlateAlt')], phFields = [phField, $('phFieldAlt')], photoPlateIndex = 0, photoPlateKey = null;
@@ -1181,7 +1182,7 @@
     renderCaption(t, hs);
     renderUtils(hs);
     renderTonight(hs);
-    if (S.c.layout === 'list') renderList(hs);
+    if (S.c.layout === 'list') { applyFocusBackdrop(null, false); renderList(hs); }
     else { photoMode = null; renderDock(hs); }
     renderAppFocusName(hs);
   }
@@ -1350,11 +1351,15 @@
     return first * g.pitch;
   }
   function dockTileHtml(it, full) {
-    var a, body;
+    var a, body, cardArt = '';
     if (it.kind === 'add') return '<span class="add">' + icon('plus') + '</span><span class="label">' + (full ? 'Home is full' : 'Add app') + '</span>';
     a = app(it.id);
     body = S.c.apps === 'text' ? '' : appMark(a, S.c.apps === 'icons' ? 176 : 180, S.c.apps === 'icons' ? 112 : 108, S.c.apps === 'icons' ? 88 : 84);
-    return body + (S.c.apps === 'icons' ? '' : '<span class="label" style="font-size:' + dockLabelSize(a.id) + 'px;top:' + ((S.c.apps === 'text' ? 44 : 168) + fontShift('primary', dockLabelSize(a.id))) + 'px"><span class="label-ink">' + esc(a.name) + '</span></span>') + '<span class="nudge nudge-l">' + icon('left') + '</span><span class="nudge nudge-r">' + icon('right') + '</span>';
+    /* Apple TV-style card art (Device Photos + Futuristic only): rich
+       artwork filling the tile, behind the device photo. Missing file
+       leaves a plain dark tile; the label and navigation are unaffected. */
+    if (a.card && (S.c.preset === 'devices' || S.c.preset === 'future') && S.c.apps !== 'text') cardArt = '<span class="card-art" style="background-image:url(' + esc(a.card) + ')"></span>';
+    return cardArt + body + (S.c.apps === 'icons' ? '' : '<span class="label" style="font-size:' + dockLabelSize(a.id) + 'px;top:' + ((S.c.apps === 'text' ? 44 : 168) + fontShift('primary', dockLabelSize(a.id))) + 'px"><span class="label-ink">' + esc(a.name) + '</span></span>') + '<span class="nudge nudge-l">' + icon('left') + '</span><span class="nudge nudge-r">' + icon('right') + '</span>';
   }
   /* A wide label can reach the shelf before its icon. Check the rendered icon box,
      including during the track's 180ms transition, so both disappear together. */
@@ -1373,6 +1378,38 @@
     if (S.c.layout !== 'dock' || S.geom !== 'broad') return;
     syncDockEdges();
     if (Date.now() < dockEdgeUntil) dockEdgeFrame = window.requestAnimationFrame(trackDockEdges);
+  }
+
+  /* Subtle focus halo (Device Photos theme only): the focused device's
+     pre-rendered backdrop, shown as a localised glow centred on the
+     focused tile — not a full-screen swap. The .focus-bg layer is
+     1600x760 and the CSS radial-gradient mask fades it to transparent
+     at its edges, so the theme's own .scene background shows through at
+     the screen edges and the hero above stays clean. HALO_W/H must
+     match the .focus-bg size in style.css (and the mask radii there).
+     A baked-alpha PNG version can replace the mask later
+     (.local/make-card-art.py already generates *-halo.png); the mask
+     is used now because it needs no new image files. Instant swap, no
+     animation on the TV path. Cleared whenever focus leaves the tiles,
+     the layout is not Dock, or another theme is active; a missing file
+     leaves the layer off and nothing breaks. */
+  var HALO_W = 1600, HALO_H = 760;
+  function applyFocusBackdrop(focusItem, tileFocus, g) {
+    var a = null, url = '', cy;
+    if (S.c.preset === 'devices' && S.c.layout === 'dock' && top().id === 'home' && tileFocus && focusItem && focusItem.kind === 'app') a = app(focusItem.id);
+    url = a && a.focusBg ? a.focusBg : '';
+    if (url) {
+      cy = g ? g.y + 16 + g.th / 2 : 724;
+      focusBgEl.style.left = (dockAnchorCenter - HALO_W / 2) + 'px';
+      focusBgEl.style.top = (cy - HALO_H / 2) + 'px';
+      focusBgEl.style.width = HALO_W + 'px';
+      focusBgEl.style.height = HALO_H + 'px';
+      focusBgEl.style.backgroundImage = 'url("' + url + '")';
+      focusBgEl.className = 'focus-bg is-on';
+    } else {
+      focusBgEl.style.backgroundImage = '';
+      focusBgEl.className = 'focus-bg';
+    }
   }
 
   function renderDock(hs) {
@@ -1415,6 +1452,7 @@
     }
     plate.className = 'plate' + (!n || empty || hs.zone === null ? '' : hs.lifted ? ' on-lift' : tileFocus ? ' on-focus' : tileSel ? ' on-sel' : '');
     plate.style.transform = 'translate3d(' + (anchor * g.pitch) + 'px,0,0)';
+    applyFocusBackdrop(focusItem, tileFocus, g);
 
     cueL.style.left = (g.x - 72) + 'px'; cueR.style.left = (g.x + g.w + 24) + 'px';
     cueL.style.top = cueR.style.top = (g.y + g.h / 2 - 24) + 'px';

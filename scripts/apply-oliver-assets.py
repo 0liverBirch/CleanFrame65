@@ -14,9 +14,14 @@ Prepared files live in the gitignored folders `.local/oliver-wallpapers/`
 glass materials per photo), `.local/oliver-devices/` (3 transparent PNGs),
 `.local/oliver-backgrounds/` (4 JPEGs, made by
 `.local/make-backgrounds.py` from his Frame-art originals and Pillow
-procedural art) and `.local/oliver-retro/` (1 PNG: the chunky CRT TV set
+procedural art), `.local/oliver-retro/` (1 PNG: the chunky CRT TV set
 for the 90s TV theme, made by `.local/make-retro-bezel.py`, glass cut out
-to transparent), each with a MANIFEST.json of sizes and SHA-256 hashes.
+to transparent) and `.local/oliver-cards/` (6 JPEGs: rich card art inside each device tile
++ a dimmed focus backdrop per device, made by `.local/make-card-art.py`),
+each with a MANIFEST.json of sizes and SHA-256 hashes. (The generator
+can also bake a 1600x760 halo PNG per device with alpha fading to
+transparent at its edges; the runtime currently fades the JPEG with a
+CSS radial-gradient mask instead, so the PNGs are not installed.)
 Those folders are local-only: they are made on Oliver's Mac from his own
 Frame-art collection in `~/workspace/your_files/frame-art/` (see
 OLIVER-HANDOVER.md), and they are never pushed to GitHub.
@@ -51,6 +56,7 @@ WALLPAPER_SOURCE = ROOT / '.local/oliver-wallpapers'
 DEVICE_SOURCE = ROOT / '.local/oliver-devices'
 BACKGROUND_SOURCE = ROOT / '.local/oliver-backgrounds'
 RETRO_SOURCE = ROOT / '.local/oliver-retro'
+CARD_SOURCE = ROOT / '.local/oliver-cards'
 WALLPAPERS = ROOT / 'app/assets/wallpapers'
 MATERIALS = ROOT / 'app/assets/materials'
 DEVICES = ROOT / 'app/assets/devices'
@@ -83,6 +89,19 @@ BACKGROUND_FILES = ['minimal-bg.jpg', 'devices-bg.jpg', 'future-bg.jpg', 'retro-
 # Memphis background with CSS scanlines only.
 RETRO_FILES = ['retro-bezel.png']
 
+# Apple TV-style device cards: rich card art inside each tile, and a
+# dimmed focus backdrop per device. The runtime shows the backdrop as a
+# subtle halo centred on the focused tile (a CSS radial-gradient mask
+# fades it to transparent at its edges, so the theme background shows
+# through around it). Made by .local/make-card-art.py from AI-generated
+# backdrops (no copyrighted poster art). Card art goes to
+# app/assets/devices/ beside the device PNGs; focus backdrops go to
+# app/assets/theme-backgrounds/ beside the theme backgrounds. If they
+# are missing, the tiles fall back to plain dark cards and the theme
+# background, so a missing file never breaks the launcher.
+CARD_FILES = ['hdmi-appletv-card.jpg', 'hdmi-ps5-card.jpg', 'hdmi-sky-card.jpg']
+FOCUS_FILES = ['hdmi-appletv-focus.jpg', 'hdmi-ps5-focus.jpg', 'hdmi-sky-focus.jpg']
+
 
 def wallpaper_files():
     for id_, _name in PHOTOS:
@@ -104,6 +123,16 @@ def background_files():
 
 def retro_files():
     for name in RETRO_FILES:
+        yield name, BACKGROUNDS
+
+
+def card_files():
+    for name in CARD_FILES:
+        yield name, DEVICES
+
+
+def focus_files():
+    for name in FOCUS_FILES:
         yield name, BACKGROUNDS
 
 
@@ -233,6 +262,22 @@ def install():
     else:
         print('No CRT bezel in ' + str(RETRO_SOURCE)
               + '; the 90s TV theme falls back to the Memphis background with CSS scanlines.')
+    cards_ok = CARD_SOURCE.is_dir()
+    if cards_ok:
+        missing, bad = verify_source(CARD_SOURCE, list(card_files()) + list(focus_files()))
+        if missing:
+            print('Missing prepared files in ' + str(CARD_SOURCE) + ': ' + ', '.join(missing))
+            return 1
+        if bad:
+            print('Files do not match MANIFEST.json (re-prepare them): ' + ', '.join(bad))
+            return 1
+        for name, dest in list(card_files()) + list(focus_files()):
+            dest.mkdir(parents=True, exist_ok=True)
+            (dest / name).write_bytes((CARD_SOURCE / name).read_bytes())
+    else:
+        print('No device card art in ' + str(CARD_SOURCE)
+              + '; tiles fall back to plain dark cards. Run python3 .local/make-card-art.py'
+              + ' to make it.')
     sources_path = WALLPAPERS / 'SOURCES.json'
     entries = json.loads(sources_path.read_text())
     have = {entry['id'] for entry in entries}
@@ -244,7 +289,8 @@ def install():
     print('Installed ' + str(len(list(wallpaper_files()))) + ' prepared wallpaper files'
           + (' and ' + str(len(DEVICE_FILES)) + ' device photos.' if devices_ok else '.')
           + (' Theme backgrounds: ' + ('installed.' if backgrounds_ok else 'not prepared.'))
-          + (' CRT bezel: ' + ('installed.' if retro_ok else 'not prepared.')))
+          + (' CRT bezel: ' + ('installed.' if retro_ok else 'not prepared.'))
+          + (' Device card art + focus backdrops: ' + ('installed.' if cards_ok else 'not prepared.')))
     if added:
         print('Added to SOURCES.json: ' + ', '.join(entry['id'] for entry in added))
     print('Catalogue entries: ' + ', '.join(IDS))
@@ -254,7 +300,7 @@ def install():
 
 def remove():
     removed = 0
-    for name, dest in list(wallpaper_files()) + list(device_files()) + list(background_files()) + list(retro_files()):
+    for name, dest in list(wallpaper_files()) + list(device_files()) + list(background_files()) + list(retro_files()) + list(card_files()) + list(focus_files()):
         path = dest / name
         if path.is_file():
             path.unlink()
@@ -323,7 +369,17 @@ def check():
     print('CRT bezel source: ' + ('present' if retro_source_ok else 'not prepared (90s TV theme falls back to CSS scanlines)'))
     print('Installed CRT bezel: ' + str(len(retro_installed)) + '/' + str(len(RETRO_FILES)) + retro_note)
     retro_ok = (not retro_source_ok) or (len(retro_installed) == len(RETRO_FILES) and not _rm and not _rb)
-    return 0 if (wallpapers_ok and devices_ok and backgrounds_ok and retro_ok) else 1
+    card_source_ok = CARD_SOURCE.is_dir()
+    _cm, _cb = ([] if not card_source_ok
+                else verify_source(CARD_SOURCE, list(card_files()) + list(focus_files())))
+    card_installed = [name for name, dest in list(card_files()) + list(focus_files()) if (dest / name).is_file()]
+    card_note = ''
+    if card_source_ok and (_cm or _cb):
+        card_note = '; manifest mismatches: ' + ', '.join(_cm + _cb)
+    print('Device card art source: ' + ('present' if card_source_ok else 'not prepared (tiles fall back to plain dark cards)'))
+    print('Installed card art + focus backdrops: ' + str(len(card_installed)) + '/' + str(len(CARD_FILES) + len(FOCUS_FILES)) + card_note)
+    cards_ok = (not card_source_ok) or (len(card_installed) == len(CARD_FILES) + len(FOCUS_FILES) and not _cm and not _cb)
+    return 0 if (wallpapers_ok and devices_ok and backgrounds_ok and retro_ok and cards_ok) else 1
 
 
 def main():

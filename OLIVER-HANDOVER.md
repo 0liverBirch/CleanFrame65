@@ -32,7 +32,24 @@ it and used it there.
   with the pre-rendered glass materials CleanFrame needs. They are
   local-only and never committed (see "Your photos and device photos").
 - **Device photos for the Device Photos theme.** Transparent PNGs of the
-  actual boxes (see "Device photos — what they are").
+  actual boxes (see "Device photos — what they are"), now sitting on rich
+  card art like Apple TV home-screen icons (see "Apple TV-style cards"
+  below).
+- **Apple TV-style cards.** The device tiles are large rounded cards
+  whose artwork fills the tile — a cinematic living room behind Apple TV,
+  a neon game canyon behind PS5, a floodlit stadium behind Sky — with the
+  photo of the actual box on top. The focused card lifts (slightly bigger,
+  strong shadow, white ring) and the others dim. In Device Photos a
+  subtle halo follows focus: a pre-rendered PNG of that device's
+  backdrop, centred on the focused tile and fading to transparent at its
+  edges (gone about 500px past the card edge), so the glow is local to
+  the card and the theme background shows through at the screen edges
+  while the hero above stays clean. (An earlier version swapped the
+  whole screen background, Top Shelf-style; Oliver asked for the subtler
+  local version instead.) Futuristic reuses the same cards (with a cyan
+  lift) but keeps its nebula background; Art Mode gets only the lift, so
+  the JFK photo stays the picture; Minimal stays text-only and 90s TV
+  keeps its bevelled plastic buttons.
 - **Bigger Home tiles.** Tiles are 400×280 (was 288×200) in icon+label
   mode, 400×140 in text mode (Minimal), with bigger labels (44px, was
   36px) and bigger device photos. The dock sits a little higher so the
@@ -75,15 +92,25 @@ look changes in one save. Your choice is remembered across restarts.
    focused tile. Background: your Petty #43 B&W photo, dimmed to about
    half and darkened further behind the tile row so the white labels stay
    readable — the car is clearly visible now. Still calm, still monochrome.
-2. **Device Photos** — each Home tile shows a photo of the actual box
-   (Apple TV 4K + remote, PS5 Slim + controller, Sky Q box) on a dark
-   gradient background with a soft shelf glow behind the tile row, so the
-   boxes do not float in a void. Needs the local-only device photos
-   installed (below); without them the tiles fall back to their labels.
+2. **Device Photos** — Apple TV-style cards (see above): each Home tile
+   is a large rounded card with rich artwork filling it and the photo of
+   the actual box on top (Apple TV 4K + remote over a cinematic living
+   room, PS5 Slim + controller over a neon game canyon, Sky Q box over a
+   floodlit stadium). The focused card lifts with a white ring and strong
+   shadow, the others dim, and a subtle halo of that device's backdrop
+   glows around the focused card, fading out as it spreads away from it,
+   while the theme background shows through at the edges. The card art
+   and halos are AI-generated generic scenes (no copyrighted poster art,
+   no logos); the device photos are the local-only PNGs below. Needs the
+   local-only device photos and card art installed (below); without the
+   card art the tiles fall back to plain dark cards, without the photos
+   to their labels.
 3. **Futuristic** — pre-rendered dark nebula background (cyan and purple
    clouds, stars, a glowing horizon and a faint perspective grid), cyan
    glass focus plate and clock glow. Static paint only, no animation, still
-   readable from the sofa.
+   readable from the sofa. Its device tiles reuse the same Apple TV-style
+   cards (rich art, device photo, focused lift with a cyan ring) but the
+   background stays the nebula — it does not swap with focus.
 4. **90s TV** — a physical 90s CRT television set filling the whole
    screen: chunky plastic bezel with rounded corners, speaker grilles down
    both sides, corner screws, a CLEANFRAME brand badge, a red power button
@@ -101,7 +128,9 @@ look changes in one save. Your choice is remembered across restarts.
    scanlines.
 5. **Art Mode Overlay** — the JFK diner photo fills the screen and the
    launcher sits on top as a minimal overlay. Unfocused tiles dim so the
-   photo reads as art when idle. If the local-only photos are not installed
+   photo reads as art when idle. The focused tile lifts slightly with a
+   soft shadow; there is no card art and no background swap, so the photo
+   stays the picture. If the local-only photos are not installed
    it uses the current wallpaper instead.
 
 Changing Background, Layout or Focus by hand afterwards still works. It does
@@ -114,6 +143,10 @@ Screenshots from the browser preview (in this local copy only, not in the
 repo): `.local/qa/themes/theme-minimal.png`,
 `.local/qa/themes/theme-devices.png`, `.local/qa/themes/theme-future.png`,
 `.local/qa/themes/theme-retro.png`, `.local/qa/themes/theme-art.png`, plus
+the Device Photos theme with each device focused:
+`.local/qa/themes/theme-devices-focus-appletv.png`,
+`.local/qa/themes/theme-devices-focus-ps5.png`,
+`.local/qa/themes/theme-devices-focus-sky.png`, plus
 `.local/qa/oliver/fresh-minimal-dock.png` (fresh install) and
 `.local/qa/oliver/photo-jfk-diner.png`.
 
@@ -142,6 +175,20 @@ public; committing them would publish them.
   `MANIFEST.json` (sizes + SHA-256).
 - Prepared device photos (3 PNGs): `.local/oliver-devices/` with
   `MANIFEST.json`.
+- Prepared device card art + focus halos (3 JPEGs + 3 PNGs): `.local/oliver-cards/`
+  with `MANIFEST.json`. Made by `.local/make-card-art.py` (Pillow) from
+  three AI-generated backdrops in `.local/card-gen-raw/` (cinematic living
+  room, neon game canyon, floodlit stadium — generic scenes, no
+  copyrighted poster art, no logos): each device gets an 800×560 card
+  (centre crop, light pool behind the black box, dark scrim under the
+  label) and a 1600×760 halo PNG (a crop of the dimmed backdrop, centred
+  on the dock row, alpha fading to transparent at the edges). Installed
+  by the same apply script — card art to `app/assets/devices/`, halos to
+  `app/assets/theme-backgrounds/`. Also local-only and never committed.
+  (The generator writes via a temp file and only replaces on success, and
+  skips files that already match the manifest — this VM intermittently
+  refuses shell-spawned writes with EPERM, and a failed write used to
+  leave a truncated asset behind.)
 - Prepared theme backgrounds (4 JPEGs): `.local/oliver-backgrounds/` with
   `MANIFEST.json`. Made by `.local/make-backgrounds.py` (Pillow): Minimal
   from your Petty #43 B&W original in `~/workspace/your_files/frame-art/`,
@@ -317,7 +364,7 @@ Home/startup change as a separate decision with its own recovery plan.
   device tests).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures** (upstream suite plus the new Theme group checks).
-- `.local/verify-oliver.mjs` (own checks) — **81/81 passed**: fresh install
+- `.local/verify-oliver.mjs` (own checks) — **103/103 passed**: fresh install
   (Minimal Black & White, dark Dock, three HDMI tiles in order, 24-hour
   clock, JFK wallpaper), hero (today's date, time-appropriate greeting,
   clock enlarged by transform) and Tonight strip (names all three boxes,
@@ -329,14 +376,65 @@ Home/startup change as a separate decision with its own recovery plan.
   photo checks, theme backgrounds loading at 1920×1080, the new larger
   tile sizes with device photos scaled up, hero + Tonight strip in every
   theme, CRT bezel/OSD/bevelled tiles/glass effects in the 90s TV theme,
-  persistence back on Home and across reload).
+  persistence back on Home and across reload), plus the Apple TV-style
+  cards (rich card art at 800×560, focused card lifts with a white ring,
+  unfocused cards dim) and the subtle focus halo (1600×760 layer centred
+  on the focused tile, radial-gradient mask fading it out, following
+  focus across all three devices, hero staying clear of it).
 - `npm run check:public` — passed (bounded secret audit; see below).
 - Public export built from a clean checkout (photos removed first):
   `dist/CleanFrame-public-unsigned.wgt`, SHA-256
-  `23421ac34ba8113ec9d31d7efbf3f7c88b8dfcbd30f4bfd3dfc5c857f86d58cf`,
-  15,789,826 bytes, 152 entries, only the 15 upstream wallpapers, no
+  `1c0c9a0e7dae00bb8412f5cf34f65a03c3380aa0c7bb384d70f407088c394f15`,
+  15,791,564 bytes, 152 entries, only the 15 upstream wallpapers, no
   Oliver photos, no device photos, no theme backgrounds and no CRT bezel.
-  The themes, the hero, the Tonight strip and the bigger tiles are in the
-  package (checked: `PRESETS` in `main.js`, theme classes and background
-  rules in `style.css`, `tw: 400` in the dock geometry).
+  The themes, the hero, the Tonight strip, the bigger tiles, the card
+  code and the halo are in the package (checked: `PRESETS`, `focusBg`,
+  `card-art`, `HALO_W`, `applyFocusBackdrop` in `main.js`, theme classes,
+  background rules, `.card-art` and the radial-gradient halo mask in
+  `style.css`, `tw: 400` in the dock geometry).
   Unsigned — signing needs your Samsung account and Mac.
+
+### Apple TV-style cards (6 Nov 2026) — built and verified
+
+- `npm run check` — passed (ESLint, `check.py`, 10/10 device tests),
+  run through the direct binaries (`./node_modules/.bin/eslint app`,
+  `python3 scripts/check.py`, `node --test scripts/test-device.mjs`).
+- `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
+  0 failures**.
+- `.local/verify-oliver.mjs` — **103/103 passed** (see above). It
+  produced the three focus screenshots
+  (`.local/qa/themes/theme-devices-focus-appletv.png`,
+  `theme-devices-focus-ps5.png`, `theme-devices-focus-sky.png`) and
+  confirmed the halo follows focus per device, the focused card lifts
+  with a white ring, and the other themes still work.
+- `python3 scripts/check-public.py` — passed (219 candidate files).
+- One real bug caught by the screenshots: the Futuristic theme showed
+  the device PNGs at natural size, overflowing the tiles (the
+  `.device-photo img` fit rule was scoped to Device Photos only). Fixed
+  by sharing the fit rule and the 340×150 mark sizing with Futuristic,
+  and the verify check now asserts the rendered PNG fits inside the
+  tile (≤340×150). Re-shot `theme-future.png` shows all three boxes
+  correctly on their cards.
+
+### VM filesystem breakage, 6 Nov 2026 ~10:41–12:14 — recovered
+
+- The VM intermittently refused all shell-spawned file writes with
+  `Operation not permitted` (Python, `cp`, `git`, Node, Chromium),
+  while the shell's own built-ins still wrote. Chromium also died at
+  launch while this lasted. Hundreds of retries failed; the outage
+  lasted until ~12:14, when writes came back and Chromium launched
+  again (v156.0.8078.4).
+- What it broke along the way: a `--remove` run failed halfway and left
+  `SOURCES.json` and `catalog.js` truncated to 0 bytes (restored by hand
+  to their exact upstream bytes, git-hash verified: SOURCES.json
+  `56c5d216…`, catalog.js `041c61f4…`), and a card-art run truncated
+  `hdmi-appletv-card.jpg` to 0 bytes (regenerated once writes returned;
+  SHA-256 matches the original manifest entry exactly, `5b51db1f…`).
+  The generator now writes via a temp file and only replaces on success,
+  and skips files that already match the manifest, so a failed write can
+  no longer leave a truncated asset behind.
+- Everything in the Blocked list is now done: assets reinstalled and
+  checked (28/28, 3/3, 4/4, 1/1, 6/6, no 0-byte files), verify 103/103,
+  browser suite 432/0, public export rebuilt (SHA `1c0c9a0e…` above),
+  assets reinstalled afterwards, and the work committed locally on
+  `oliver-launcher` (see "Steps you still do" — still NOT pushed).

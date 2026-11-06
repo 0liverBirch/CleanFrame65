@@ -117,15 +117,30 @@ strip are not focusable.
 - Minimal Black & White is monochrome only: a dimmed Petty #43 B&W photo
   as the background (darkened further behind the tile row), text-only
   tiles, a plain white focus outline instead of a glass plate.
-- Device Photos shows a transparent photo of the actual box on each Home
-  tile (Apple TV 4K + remote, PS5 Slim + controller, Sky Q box) on a dark
-  gradient background with a soft shelf glow behind the dock row. The PNGs
-  are local-only, installed by `scripts/apply-oliver-assets.py` from
-  `.local/oliver-devices/`; if they are missing, the tiles fall back to
-  their labels and navigation is unaffected.
+- Device Photos is the Apple TV-style theme: each Home tile is a large
+  rounded card whose rich artwork fills the tile — a cinematic living
+  room behind the Apple TV 4K + remote, a neon game canyon behind the
+  PS5 Slim + controller, a floodlit stadium behind the Sky Q box — with
+  the transparent photo of the actual box on top. The focused card lifts
+  (slightly larger, strong drop shadow, white ring) while the others sit
+  flatter and dimmer, and a subtle halo follows focus: that device's
+  pre-rendered backdrop on a 1600x760 layer, centred on the focused
+  tile and faded to transparent at its edges by a CSS radial-gradient
+  mask (gone about 500px past the card edge), so the glow is local to
+  the card and the theme background shows through at the screen edges
+  while the hero above stays clean (instant swap, no animation). The
+  PNGs, card art and backdrops are local-only, installed by
+  `scripts/apply-oliver-assets.py` from `.local/oliver-devices/` and
+  `.local/oliver-cards/` (made by `.local/make-card-art.py` from
+  AI-generated backdrops — no copyrighted poster art); if any file is
+  missing, that tile falls back to a plain dark card and the halo stays
+  off, and navigation is unaffected.
 - Futuristic is a static neon/glass look: a pre-rendered dark nebula
   background (cyan/purple clouds, stars, glowing horizon, faint perspective
-  grid), cyan focus plate and clock glow. No live blur, no animation.
+  grid), cyan focus plate and clock glow. No live blur, no animation. Its
+  device tiles reuse the same Apple TV-style cards (rich card art, device
+  photo on top, focused lift with a cyan ring) but keep the nebula
+  background — the backdrop does not swap here.
 - 90s TV is a physical 90s CRT television set filling the whole screen:
   a pre-rendered 1920x1080 PNG of a chunky plastic bezel (speaker grilles,
   corner screws, brand badge, red power button and standby LED, VHS slot,
@@ -146,7 +161,10 @@ strip are not focusable.
 - Art Mode Overlay fills the screen with the JFK diner photo (or the
   current wallpaper if the local-only photos are not installed) and puts the
   launcher on top as a minimal overlay: unfocused tiles dim so the photo
-  reads as art when idle.
+  reads as art when idle. The focused tile lifts slightly with a soft
+  shadow; there is no card art and no backdrop swap, so the photo stays
+  the picture. Minimal stays text-only and 90s TV keeps its bevelled
+  plastic buttons; neither gets the card treatment.
 
 Theme styling is static CSS under the `th-<preset>` stage class; it never
 uses live blur or backdrop filters. The four non-Art themes paint one
