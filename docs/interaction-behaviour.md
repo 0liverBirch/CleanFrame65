@@ -150,9 +150,15 @@ strip are not focusable.
   Memphis-pattern background, a stronger scanline overlay with a vignette
   and a diagonal glass reflection, a green channel OSD ("CH 03 · AV1") and
   chunky bevelled plastic tiles with drop shadows and uppercase labels in
-  the magenta/purple/teal/yellow palette. The caption and utils move inside
-  the glass; the Tonight strip is hidden because the bezel's bottom band
-  occupies that strip. The bezel PNG is local-only, made by
+  the magenta/purple/teal/yellow palette. The tiles now carry the same
+  Apple TV-style cards as Device Photos — rich card art with the device
+  photo on top — but inset 10px inside each button, so a plastic rim
+  shows and the set keeps its bevelled-button character; the scanline
+  and vignette overlay sits above the tiles, so the cards read as if
+  they are on the CRT glass. The focused button lifts slightly and
+  keeps its magenta glow; there is no halo inside the glass. The caption
+  and utils move inside the glass; the Tonight strip is hidden because
+  the bezel's bottom band occupies that strip. The bezel PNG is local-only, made by
   `.local/make-retro-bezel.py` and installed by
   `scripts/apply-oliver-assets.py` from `.local/oliver-retro/`; without it
   the theme falls back to the Memphis background with CSS scanlines only.
@@ -161,11 +167,12 @@ strip are not focusable.
   the glass, not the typeface.
 - Art Mode Overlay fills the screen with the JFK diner photo (or the
   current wallpaper if the local-only photos are not installed) and puts the
-  launcher on top as a minimal overlay: unfocused tiles dim so the photo
-  reads as art when idle. The focused tile lifts slightly with a soft
-  shadow; there is no card art and no backdrop swap, so the photo stays
-  the picture. Minimal stays text-only and 90s TV keeps its bevelled
-  plastic buttons; neither gets the card treatment.
+  launcher on top as a minimal overlay. Its tiles now carry the same
+  Apple TV-style cards as Device Photos (rich card art, device photo on
+  top, focused lift with a soft shadow), but there is no halo: unfocused
+  cards dim to 55% so the photo still reads as art when idle, and the
+  focused card shows its artwork at full strength. Minimal stays text-only
+  and gets no cards; that is the theme.
 
 Theme styling is static CSS under the `th-<preset>` stage class; it never
 uses live blur or backdrop filters. The four non-Art themes paint one

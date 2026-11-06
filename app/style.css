@@ -661,9 +661,8 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .th-minimal .scene{background:#0d0d0d url("assets/theme-backgrounds/minimal-bg.jpg") center/cover no-repeat}
 .th-devices{background:#0d1113}
 .th-devices .scene{background:#0d1113 url("assets/theme-backgrounds/devices-bg.jpg") center/cover no-repeat}
-.th-devices .tile .mark{left:30px!important;top:12px!important;width:340px!important;height:150px!important}
-.th-devices .device-photo img,.th-future .device-photo img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
-.th-future .tile .mark{left:30px!important;top:12px!important;width:340px!important;height:150px!important}
+.th-devices .tile .mark,.th-future .tile .mark,.th-art .tile .mark,.th-retro .tile .mark{left:30px!important;top:12px!important;width:340px!important;height:150px!important}
+.th-devices .device-photo img,.th-future .device-photo img,.th-art .device-photo img,.th-retro .device-photo img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
 .th-future{background:linear-gradient(160deg,#0b1c26 0%,#101b2e 55%,#160f2e 100%)}
 .th-future .scene{background:#101b2e url("assets/theme-backgrounds/future-bg.jpg") center/cover no-repeat}
 .th-future{--solid:#8ef1ff;--solid-ink:#06222b;--plate:linear-gradient(170deg,rgba(0,229,255,.34),rgba(0,229,255,.12) 58%,rgba(0,229,255,.20));--plate-edge:inset 0 1px 0 rgba(140,240,255,.5)}
@@ -695,15 +694,28 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .th-retro.l-dock .utils{top:196px;right:200px}
 .th-retro.l-dock .util-focus-label{top:264px!important}
 .at-appearance .crt-frame,.at-appearance .crt-osd,.is-sheet .crt-frame,.is-sheet .crt-osd{display:none}
-/* Chunky bevelled plastic 90s buttons with drop shadows. */
+/* Chunky bevelled plastic 90s buttons with drop shadows. The card art
+   sits inset inside the button (10px plastic rim all round), so the
+   CRT set keeps its bevelled-button character: the tile stays plastic,
+   the artwork is a little screen inside it. The CRT scanline/vignette
+   overlay sits above the tiles, so the cards read as if they are on
+   the CRT glass. No halo here — a glow inside the glass would fight
+   the set. */
 .th-retro .tile{border-radius:20px;background:linear-gradient(180deg,#3d3d48,#232329);box-shadow:0 6px 0 #0e0e12,0 12px 22px rgba(0,0,0,.55),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -4px 0 rgba(0,0,0,.55)}
 .th-retro .tile.is-focus{background:linear-gradient(180deg,#4a2a5e,#2c1840);box-shadow:0 6px 0 #0e0e12,0 0 32px rgba(255,46,136,.35),inset 0 2px 0 rgba(255,255,255,.4),inset 0 -4px 0 rgba(0,0,0,.55)}
+.th-retro .tile .card-art{left:10px;top:10px;width:380px;height:260px;border-radius:12px}
+.th-retro .tile.is-focus{z-index:2}
+.th-retro .tile.is-focus .tile-content{transform:scale(1.06)}
+.th-retro .tile:not(.is-focus) .tile-content{opacity:.8}
 .th-retro .tile .label{text-shadow:0 2px 0 rgba(0,0,0,.6)}
 /* CRT glass: vignette, a diagonal glass reflection and stronger scanlines. */
 .th-retro::before{display:none}
 .th-retro::after{content:"";position:absolute;left:0;top:0;width:1920px;height:1080px;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.45) 100%),linear-gradient(115deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.03) 18%,transparent 30%),repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,transparent 2px 3px);pointer-events:none;z-index:60}
 .th-art .mat-veil{background:rgba(8,14,18,.06)}
 .th-art .tile:not(.is-focus) .mark,.th-art .tile:not(.is-focus) .label{opacity:.55}
+/* Art Mode: unfocused cards dim so the JFK photo stays the picture
+   when idle; the focused card shows its artwork at full strength. */
+.th-art .tile:not(.is-focus) .card-art{opacity:.55}
 /* ---------- Apple TV-style device cards (Oliver fork) ----------
    tvOS home-screen language: a large rounded card whose artwork fills
    the tile, the focused card lifting (scale + strong shadow + white
@@ -722,16 +734,19 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
    fades.)
    Futuristic gets the same cards with a cyan lift, but keeps its
    nebula background — a halo there would fight the theme. Art Mode
-   Overlay keeps its JFK photo as the background, so it gets only the
-   lift and shadow, no card art and no halo. Minimal stays text-only
-   and 90s TV keeps its bevelled plastic buttons; neither is touched
-   here. */
+   Overlay keeps its JFK photo as the background and gets the cards
+   too, but no halo: unfocused cards dim to 55% so the photo stays
+   the picture when idle, and the focused card shows its artwork at
+   full strength. 90s TV gets the cards inset inside its bevelled
+   plastic buttons (10px plastic rim, scanlines over the top), so
+   the CRT set keeps its character — no halo inside the glass.
+   Minimal stays text-only and gets no cards; that is the theme. */
 .focus-bg{position:absolute;left:0;top:0;width:1920px;height:880px;background-size:cover;background-position:center;opacity:0;pointer-events:none;-webkit-mask-image:radial-gradient(ellipse 940px 420px at center,#000 0%,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 940px 420px at center,#000 0%,#000 60%,transparent 100%)}
 .focus-bg.is-on{opacity:1}
 .card-art{display:none;position:absolute;left:0;top:0;width:100%;height:100%;border-radius:inherit;background-size:cover;background-position:center}
-.th-devices .tile .card-art,.th-future .tile .card-art{display:block}
-.th-devices .tile,.th-future .tile{background:#0d1113}
-.th-devices .tile,.th-future .tile,.th-art .tile{transition:transform var(--t) var(--ease),box-shadow 160ms linear}
+.th-devices .tile .card-art,.th-future .tile .card-art,.th-art .tile .card-art,.th-retro .tile .card-art{display:block}
+.th-devices .tile,.th-future .tile,.th-art .tile{background:#0d1113}
+.th-devices .tile,.th-future .tile,.th-art .tile,.th-retro .tile{transition:transform var(--t) var(--ease),box-shadow 160ms linear}
 .th-devices .tile:not(.is-focus) .tile-content,.th-future .tile:not(.is-focus) .tile-content{opacity:.62}
 .th-devices .tile.is-focus,.th-future .tile.is-focus,.th-art .tile.is-focus{z-index:2}
 .th-devices .tile.is-focus .tile-content,.th-future .tile.is-focus .tile-content{transform:scale(1.06)}

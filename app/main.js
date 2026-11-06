@@ -182,12 +182,14 @@
       + (maskSupport ? '<span class="mk" style="' + st + ';-webkit-mask-image:url(' + ICONS + id + '.svg);mask-image:url(' + ICONS + id + '.svg)"></span>' : '<img alt="" src="' + ICONS + id + '.svg" style="' + st + '">') + '</span>';
   }
   function appMark(a, w, h, size) {
-    /* Device Photos and Futuristic themes: the tile shows a transparent
-       photo of the actual box instead of a mark, sitting on the rich card
-       art (see dockTileHtml). If the local-only PNG is missing, the image
-       is removed and the tile falls back to its label alone; nothing here
-       ever blocks navigation. */
-    if ((S.c.preset === 'devices' || S.c.preset === 'future') && a.photo) return '<span class="mark device-photo" style="width:' + w + 'px;height:' + h + 'px"><img src="' + esc(a.photo) + '" alt="" onerror="this.remove()"></span>';
+    /* Device Photos, Futuristic, Art Mode Overlay and 90s TV: the tile
+       shows a transparent photo of the actual box instead of a mark,
+       sitting on the rich card art (see dockTileHtml). Minimal stays
+       text-only (its look sets apps to text, so no mark renders there).
+       If the local-only PNG is missing, the image is removed and the
+       tile falls back to its label alone; nothing here ever blocks
+       navigation. */
+    if ((S.c.preset === 'devices' || S.c.preset === 'future' || S.c.preset === 'art' || S.c.preset === 'retro') && a.photo) return '<span class="mark device-photo" style="width:' + w + 'px;height:' + h + 'px"><img src="' + esc(a.photo) + '" alt="" onerror="this.remove()"></span>';
     if (a.mark && (maskSupport || S.c.bg !== 'light')) return markHtml(a.brand || a.id, w, h, size);
     var words = a.name.split(/\s+/), letters = words[0].charAt(0) + (words.length > 1 ? words[1].charAt(0) : '');
     return '<span class="mark monogram' + (a.icon ? ' native-icon' : '') + '" style="width:' + w + 'px;height:' + h + 'px;font-size:' + Math.round(size * .65) + 'px"><span>' + esc(letters.toUpperCase()) + '</span>'
@@ -1355,10 +1357,12 @@
     if (it.kind === 'add') return '<span class="add">' + icon('plus') + '</span><span class="label">' + (full ? 'Home is full' : 'Add app') + '</span>';
     a = app(it.id);
     body = S.c.apps === 'text' ? '' : appMark(a, S.c.apps === 'icons' ? 176 : 180, S.c.apps === 'icons' ? 112 : 108, S.c.apps === 'icons' ? 88 : 84);
-    /* Apple TV-style card art (Device Photos + Futuristic only): rich
-       artwork filling the tile, behind the device photo. Missing file
-       leaves a plain dark tile; the label and navigation are unaffected. */
-    if (a.card && (S.c.preset === 'devices' || S.c.preset === 'future') && S.c.apps !== 'text') cardArt = '<span class="card-art" style="background-image:url(' + esc(a.card) + ')"></span>';
+    /* Apple TV-style card art (Device Photos, Futuristic, Art Mode
+       Overlay and 90s TV): rich artwork filling the tile, behind the
+       device photo. Minimal stays text-only (S.c.apps is 'text' there,
+       so this is skipped). Missing file leaves a plain dark tile; the
+       label and navigation are unaffected. */
+    if (a.card && (S.c.preset === 'devices' || S.c.preset === 'future' || S.c.preset === 'art' || S.c.preset === 'retro') && S.c.apps !== 'text') cardArt = '<span class="card-art" style="background-image:url(' + esc(a.card) + ')"></span>';
     return cardArt + body + (S.c.apps === 'icons' ? '' : '<span class="label" style="font-size:' + dockLabelSize(a.id) + 'px;top:' + ((S.c.apps === 'text' ? 44 : 168) + fontShift('primary', dockLabelSize(a.id))) + 'px"><span class="label-ink">' + esc(a.name) + '</span></span>') + '<span class="nudge nudge-l">' + icon('left') + '</span><span class="nudge nudge-r">' + icon('right') + '</span>';
   }
   /* A wide label can reach the shelf before its icon. Check the rendered icon box,

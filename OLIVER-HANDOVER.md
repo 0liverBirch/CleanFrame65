@@ -51,9 +51,12 @@ it and used it there.
   the glow lived only inside the focused card, because its full-strength
   core was barely bigger than the card and the backdrop was dimmed to
   about half.) Futuristic reuses the same cards (with a cyan lift) but
-  keeps its nebula background; Art Mode gets only the lift, so the JFK
-  photo stays the picture; Minimal stays text-only and 90s TV keeps its
-  bevelled plastic buttons.
+  keeps its nebula background and no halo. Art Mode Overlay gets the
+  same cards too, with no halo — unfocused cards dim to 55% so the JFK
+  photo stays the picture when idle. 90s TV gets the cards inset inside
+  its bevelled plastic buttons (10px plastic rim, scanlines over the
+  top), so the CRT set keeps its character, and no halo inside the
+  glass. Minimal stays text-only and gets no cards; that is the theme.
 - **Bigger Home tiles.** Tiles are 400×280 (was 288×200) in icon+label
   mode, 400×140 in text mode (Minimal), with bigger labels (44px, was
   36px) and bigger device photos. The dock sits a little higher so the
@@ -125,17 +128,24 @@ look changes in one save. Your choice is remembered across restarts.
    circle, teal triangle, yellow shapes), a green channel OSD ("CH 03 ·
    AV1"), stronger scanlines, a vignette and a slight glass reflection,
    and chunky bevelled plastic tiles with drop shadows and uppercase
-   labels in the same magenta/purple/teal/yellow palette. The type stays
+   labels in the same magenta/purple/teal/yellow palette. The tiles
+   carry the same Apple TV-style cards as Device Photos — rich card art
+   with the device photo on top — but inset 10px inside each button, so
+   a plastic rim shows and the set keeps its bevelled-button character;
+   the scanlines sit above the tiles, so the cards read as if they are
+   on the CRT glass. The focused button lifts slightly and keeps its
+   magenta glow; there is no halo inside the glass. The type stays
    the bundled sans — a real pixel font would break the TV's measured
    label widths, so the retro feel comes from the set, the colours and the
    glass, not the typeface. The bezel is a local-only PNG (see below);
    without it the theme falls back to the Memphis background with
    scanlines.
 5. **Art Mode Overlay** — the JFK diner photo fills the screen and the
-   launcher sits on top as a minimal overlay. Unfocused tiles dim so the
-   photo reads as art when idle. The focused tile lifts slightly with a
-   soft shadow; there is no card art and no background swap, so the photo
-   stays the picture. If the local-only photos are not installed
+   launcher sits on top as a minimal overlay. Its tiles now carry the
+   same Apple TV-style cards as Device Photos (rich card art, device
+   photo on top, focused lift with a soft shadow), but there is no halo:
+   unfocused cards dim to 55% so the photo still reads as art when idle,
+   and the focused card shows its artwork at full strength. If the local-only photos are not installed
    it uses the current wallpaper instead.
 
 Changing Background, Layout or Focus by hand afterwards still works. It does
@@ -372,7 +382,7 @@ Home/startup change as a separate decision with its own recovery plan.
   device tests).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures** (upstream suite plus the new Theme group checks).
-- `.local/verify-oliver.mjs` (own checks) — **109/109 passed**: fresh install
+- `.local/verify-oliver.mjs` (own checks) — **116/116 passed**: fresh install
   (Minimal Black & White, dark Dock, three HDMI tiles in order, 24-hour
   clock, JFK wallpaper), hero (today's date, time-appropriate greeting,
   clock enlarged by transform) and Tonight strip (names all three boxes,
@@ -385,16 +395,21 @@ Home/startup change as a separate decision with its own recovery plan.
   tile sizes with device photos scaled up, hero + Tonight strip in every
   theme, CRT bezel/OSD/bevelled tiles/glass effects in the 90s TV theme,
   persistence back on Home and across reload), plus the Apple TV-style
-  cards (rich card art at 800×560, focused card lifts with a white ring,
-  unfocused cards dim) and the wide focus halo (1920×880 layer centred
+  cards in every theme that has them (rich card art at 800×560 and device
+  PNGs fitted inside the tile in Device Photos, Futuristic, Art Mode
+  Overlay and 90s TV; no cards in Minimal, which stays text-only by
+  design; card art inset 10px inside the bevelled 90s buttons; Art Mode
+  unfocused cards dimmed to 55% and no halo in Art, Futuristic or 90s),
+  focused card lifts with a white ring, unfocused cards dim, and the wide
+  focus halo in Device Photos (1920×880 layer centred
   on the focused tile, radial-gradient mask 940×420 full strength to 60%,
   core reaching the neighbouring cards' centres, hero staying clean above
   it, following focus across all three devices).
 - `npm run check:public` — passed (bounded secret audit; see below).
 - Public export built from a clean checkout (photos removed first):
   `dist/CleanFrame-public-unsigned.wgt`, SHA-256
-  `c2788c958af9ba3cb395d5be44d510a5dc14f88f28095894a06be3f6a6073fde`,
-  15,791,830 bytes, 152 entries, only the 15 upstream wallpapers, no
+  `15a37ee99bf4f0c9b6ee7621a56634171db023d635256357cd7ec93c8eff4e7d`,
+  15,792,257 bytes, 152 entries, only the 15 upstream wallpapers, no
   Oliver photos, no device photos, no theme backgrounds and no CRT bezel.
   The themes, the hero, the Tonight strip, the bigger tiles, the card
   code and the halo are in the package (checked: `PRESETS`, `focusBg`,
@@ -410,7 +425,7 @@ Home/startup change as a separate decision with its own recovery plan.
   `python3 scripts/check.py`, `node --test scripts/test-device.mjs`).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures**.
-- `.local/verify-oliver.mjs` — **109/109 passed** (see above). It
+- `.local/verify-oliver.mjs` — **116/116 passed** (see above). It
   produced the three focus screenshots
   (`.local/qa/themes/theme-devices-focus-appletv.png`,
   `theme-devices-focus-ps5.png`, `theme-devices-focus-sky.png`) and
@@ -450,6 +465,39 @@ Home/startup change as a separate decision with its own recovery plan.
   every card is inside the fade.
 - Checks after the change: verify 109/109, browser suite 432/0, public
   export rebuilt (SHA `c2788c95…` above), assets reinstalled, committed
+  locally on `oliver-launcher` (still NOT pushed).
+
+### Cards in every theme (6 Nov 2026) — mockups for all five themes
+
+- Oliver asked to see the new cards in the other themes too, since the
+  Device Photos screenshots in chat looked very different from the
+  before/after composites. So the cards are now a proper theme treatment,
+  not a mockup hack: the same card art, device photos and focus lift in
+  Device Photos, Futuristic, Art Mode Overlay and 90s TV, each fitted
+  to that theme's character. Minimal stays text-only — that is the theme,
+  and the choice is recorded here rather than forced.
+- Futuristic was already there (same cards, cyan lift, nebula kept, no
+  halo); re-shot to confirm, nothing changed.
+- Art Mode Overlay: full cards on top of the JFK photo, no halo.
+  Unfocused cards dim to 55% so the photo still reads as art when idle;
+  the focused card shows its artwork at full strength with a soft shadow.
+  The photo still dominates the screen — the cards sit in the frosted
+  dock strip, they do not cover the picture.
+- 90s TV: the compromise. The cards sit inset 10px inside the bevelled
+  plastic buttons, so a plastic rim shows and the set keeps its
+  character; the scanline/vignette overlay sits above the tiles, so the
+  cards read as little screens on the CRT glass. The focused button
+  lifts slightly and keeps its magenta glow; no halo inside the glass.
+  The plain bevelled-button version is gone from the build — if Oliver
+  prefers it, it is one CSS gate away (drop `retro` from the card-art
+  gate in `dockTileHtml`/`appMark`).
+- The halo stays Device Photos-only. Futuristic, Art and 90s get no halo.
+- One check bug along the way, in the check, not the app: the new Retro
+  inset check first measured with `getBoundingClientRect`, which reads
+  5px in the half-scale Settings preview for a 10px inset. It now
+  measures layout px (`offset*`), which read exactly 10px.
+- Checks after the change: verify 116/116, browser suite 432/0, public
+  export rebuilt (SHA `15a37ee9…` above), assets reinstalled, committed
   locally on `oliver-launcher` (still NOT pushed).
 
 ### VM filesystem breakage, 6 Nov 2026 ~10:41–12:14 — recovered
