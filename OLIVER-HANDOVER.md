@@ -288,19 +288,22 @@ Home/startup change as a separate decision with its own recovery plan.
   device tests).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures** (upstream suite plus the new Theme group checks).
-- `.local/verify-oliver.mjs` (own checks) — **48/48 passed**: fresh install
+- `.local/verify-oliver.mjs` (own checks) — **59/59 passed**: fresh install
   (Minimal Black & White, dark Dock, three HDMI tiles in order, 24-hour
   clock, JFK wallpaper), HDMI mapping (chooser names the device, picking
   HDMI 2 calls `setSource(2)`, mapping saved and survives reload, mapped
   tile switches directly), all four photo wallpapers render, and all five
   themes applied through the real Settings UI (look values, stage class,
-  device PNGs loading, gradient/scanline/photo checks, persistence back on
-  Home and across reload).
+  device PNGs loading, gradient/scanline/photo checks, theme backgrounds
+  loading at 1920×1080, the new larger tile sizes with device photos
+  scaled up, persistence back on Home and across reload).
 - `npm run check:public` — passed (bounded secret audit; see below).
 - Public export built from a clean checkout (photos removed first):
   `dist/CleanFrame-public-unsigned.wgt`, SHA-256
-  `425ce1f43eac736562aa81916061afa8b0e36f7d315a3e2b3d07a14f77bcad0d`,
-  15,787,775 bytes, 152 entries, only the 15 upstream wallpapers, no
-  Oliver photos and no device photos. The themes are in the package
-  (checked: `PRESETS` in `main.js`, theme classes in `style.css`).
+  `9732faecb4fb833cc424b54945db2ef4c875022f88274763d0afd0711db9f3a3`,
+  15,787,863 bytes, 152 entries, only the 15 upstream wallpapers, no
+  Oliver photos, no device photos and no theme backgrounds. The themes and
+  the bigger tiles are in the package (checked: `PRESETS` in `main.js`,
+  theme classes and background rules in `style.css`, `tw: 400` in the dock
+  geometry).
   Unsigned — signing needs your Samsung account and Mac.
