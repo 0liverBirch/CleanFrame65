@@ -39,17 +39,21 @@ it and used it there.
   whose artwork fills the tile — a cinematic living room behind Apple TV,
   a neon game canyon behind PS5, a floodlit stadium behind Sky — with the
   photo of the actual box on top. The focused card lifts (slightly bigger,
-  strong shadow, white ring) and the others dim. In Device Photos a
-  subtle halo follows focus: a pre-rendered PNG of that device's
-  backdrop, centred on the focused tile and fading to transparent at its
-  edges (gone about 500px past the card edge), so the glow is local to
-  the card and the theme background shows through at the screen edges
-  while the hero above stays clean. (An earlier version swapped the
-  whole screen background, Top Shelf-style; Oliver asked for the subtler
-  local version instead.) Futuristic reuses the same cards (with a cyan
-  lift) but keeps its nebula background; Art Mode gets only the lift, so
-  the JFK photo stays the picture; Minimal stays text-only and 90s TV
-  keeps its bevelled plastic buttons.
+  strong shadow, white ring) and the others dim. In Device Photos a strong,
+  wide halo follows focus: the focused device's backdrop, brightened to
+  about three-quarters, on a 1920×880 layer centred on the focused tile
+  and faded to transparent at its far edges by a CSS radial-gradient
+  mask (ellipse 940×420, full strength to 60%), so the glow clearly
+  extends behind the neighbouring cards while still fading out before
+  the screen edges and keeping the hero above clean. (An earlier version
+  swapped the whole screen background, Top Shelf-style; a later one was
+  a smaller 1600×760 halo that Oliver found too subtle — it read as if
+  the glow lived only inside the focused card, because its full-strength
+  core was barely bigger than the card and the backdrop was dimmed to
+  about half.) Futuristic reuses the same cards (with a cyan lift) but
+  keeps its nebula background; Art Mode gets only the lift, so the JFK
+  photo stays the picture; Minimal stays text-only and 90s TV keeps its
+  bevelled plastic buttons.
 - **Bigger Home tiles.** Tiles are 400×280 (was 288×200) in icon+label
   mode, 400×140 in text mode (Minimal), with bigger labels (44px, was
   36px) and bigger device photos. The dock sits a little higher so the
@@ -97,9 +101,10 @@ look changes in one save. Your choice is remembered across restarts.
    the actual box on top (Apple TV 4K + remote over a cinematic living
    room, PS5 Slim + controller over a neon game canyon, Sky Q box over a
    floodlit stadium). The focused card lifts with a white ring and strong
-   shadow, the others dim, and a subtle halo of that device's backdrop
-   glows around the focused card, fading out as it spreads away from it,
-   while the theme background shows through at the edges. The card art
+   shadow, the others dim, and a wide halo of that device's backdrop
+   glows behind the whole dock row around the focused card, fading out
+   as it spreads away from it, while the theme background shows through
+   at the edges. The card art
    and halos are AI-generated generic scenes (no copyrighted poster art,
    no logos); the device photos are the local-only PNGs below. Needs the
    local-only device photos and card art installed (below); without the
@@ -175,16 +180,19 @@ public; committing them would publish them.
   `MANIFEST.json` (sizes + SHA-256).
 - Prepared device photos (3 PNGs): `.local/oliver-devices/` with
   `MANIFEST.json`.
-- Prepared device card art + focus halos (3 JPEGs + 3 PNGs): `.local/oliver-cards/`
+- Prepared device card art + focus backdrops + halo PNGs (9 files): `.local/oliver-cards/`
   with `MANIFEST.json`. Made by `.local/make-card-art.py` (Pillow) from
   three AI-generated backdrops in `.local/card-gen-raw/` (cinematic living
   room, neon game canyon, floodlit stadium — generic scenes, no
   copyrighted poster art, no logos): each device gets an 800×560 card
   (centre crop, light pool behind the black box, dark scrim under the
-  label) and a 1600×760 halo PNG (a crop of the dimmed backdrop, centred
-  on the dock row, alpha fading to transparent at the edges). Installed
-  by the same apply script — card art to `app/assets/devices/`, halos to
-  `app/assets/theme-backgrounds/`. Also local-only and never committed.
+  label), a 1920×1080 focus backdrop (brightened to about three-quarters,
+  darker top and bottom band) that the runtime shows as the wide halo
+  through a CSS mask, and a 1920×880 halo PNG (the same glow with the
+  fade baked into the alpha channel, kept for a future switch away from
+  the mask). Installed by the same apply script — card art to
+  `app/assets/devices/`, focus backdrops to `app/assets/theme-backgrounds/`.
+  Also local-only and never committed.
   (The generator writes via a temp file and only replaces on success, and
   skips files that already match the manifest — this VM intermittently
   refuses shell-spawned writes with EPERM, and a failed write used to
@@ -364,7 +372,7 @@ Home/startup change as a separate decision with its own recovery plan.
   device tests).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures** (upstream suite plus the new Theme group checks).
-- `.local/verify-oliver.mjs` (own checks) — **103/103 passed**: fresh install
+- `.local/verify-oliver.mjs` (own checks) — **109/109 passed**: fresh install
   (Minimal Black & White, dark Dock, three HDMI tiles in order, 24-hour
   clock, JFK wallpaper), hero (today's date, time-appropriate greeting,
   clock enlarged by transform) and Tonight strip (names all three boxes,
@@ -378,14 +386,15 @@ Home/startup change as a separate decision with its own recovery plan.
   theme, CRT bezel/OSD/bevelled tiles/glass effects in the 90s TV theme,
   persistence back on Home and across reload), plus the Apple TV-style
   cards (rich card art at 800×560, focused card lifts with a white ring,
-  unfocused cards dim) and the subtle focus halo (1600×760 layer centred
-  on the focused tile, radial-gradient mask fading it out, following
-  focus across all three devices, hero staying clear of it).
+  unfocused cards dim) and the wide focus halo (1920×880 layer centred
+  on the focused tile, radial-gradient mask 940×420 full strength to 60%,
+  core reaching the neighbouring cards' centres, hero staying clean above
+  it, following focus across all three devices).
 - `npm run check:public` — passed (bounded secret audit; see below).
 - Public export built from a clean checkout (photos removed first):
   `dist/CleanFrame-public-unsigned.wgt`, SHA-256
-  `1c0c9a0e7dae00bb8412f5cf34f65a03c3380aa0c7bb384d70f407088c394f15`,
-  15,791,564 bytes, 152 entries, only the 15 upstream wallpapers, no
+  `c2788c958af9ba3cb395d5be44d510a5dc14f88f28095894a06be3f6a6073fde`,
+  15,791,830 bytes, 152 entries, only the 15 upstream wallpapers, no
   Oliver photos, no device photos, no theme backgrounds and no CRT bezel.
   The themes, the hero, the Tonight strip, the bigger tiles, the card
   code and the halo are in the package (checked: `PRESETS`, `focusBg`,
@@ -401,7 +410,7 @@ Home/startup change as a separate decision with its own recovery plan.
   `python3 scripts/check.py`, `node --test scripts/test-device.mjs`).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures**.
-- `.local/verify-oliver.mjs` — **103/103 passed** (see above). It
+- `.local/verify-oliver.mjs` — **109/109 passed** (see above). It
   produced the three focus screenshots
   (`.local/qa/themes/theme-devices-focus-appletv.png`,
   `theme-devices-focus-ps5.png`, `theme-devices-focus-sky.png`) and
@@ -415,6 +424,33 @@ Home/startup change as a separate decision with its own recovery plan.
   and the verify check now asserts the rendered PNG fits inside the
   tile (≤340×150). Re-shot `theme-future.png` shows all three boxes
   correctly on their cards.
+
+### Stronger halo (6 Nov 2026) — the 1600×760 version was too subtle
+
+- Oliver's read was right: the old halo's full-strength core (45% of a
+  700×330 mask ellipse) was barely bigger than the 400×280 card itself,
+  and the backdrop was dimmed to about half, so the glow read as if it
+  lived only inside the focused card.
+- Now: 1920×880 layer, mask ellipse 940×420 full strength to 60%
+  (core 564px, so it covers the neighbouring cards' centres 416px
+  away), backdrop brightened to about three-quarters (top shade 0.38→
+  0.22, bottom band 0.5→0.35). The layer top (284) sits above the
+  hero's bottom edge, but the mask is ~85% faded there, so the hero
+  stays clean. Still a halo, not a full-screen swap: it fades to
+  transparent at the far edges. Baked-alpha PNG halos in
+  `.local/oliver-cards/` were regenerated at the same 1920×880 geometry
+  (centre alpha 255, core 0.60) for a future switch, but the shipped
+  version still uses the CSS mask — same rendering path the shelf and
+  list fades already use, no new files to install.
+- Two check fixes along the way, both in the checks, not the app:
+  Chromium serialises the mask as `rgb(0, 0, 0) 60%` (no `ellipse`
+  keyword), and the far neighbour on an end tile sits outside the
+  full-strength core but inside the 940px fade radius, so the
+  neighbour check now asserts the adjacent card is in the core and
+  every card is inside the fade.
+- Checks after the change: verify 109/109, browser suite 432/0, public
+  export rebuilt (SHA `c2788c95…` above), assets reinstalled, committed
+  locally on `oliver-launcher` (still NOT pushed).
 
 ### VM filesystem breakage, 6 Nov 2026 ~10:41–12:14 — recovered
 
@@ -434,7 +470,7 @@ Home/startup change as a separate decision with its own recovery plan.
   and skips files that already match the manifest, so a failed write can
   no longer leave a truncated asset behind.
 - Everything in the Blocked list is now done: assets reinstalled and
-  checked (28/28, 3/3, 4/4, 1/1, 6/6, no 0-byte files), verify 103/103,
-  browser suite 432/0, public export rebuilt (SHA `1c0c9a0e…` above),
+  checked (28/28, 3/3, 4/4, 1/1, 6/6, no 0-byte files), verify 109/109,
+  browser suite 432/0, public export rebuilt (SHA `c2788c95…` above),
   assets reinstalled afterwards, and the work committed locally on
   `oliver-launcher` (see "Steps you still do" — still NOT pushed).

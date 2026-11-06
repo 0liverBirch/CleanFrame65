@@ -708,21 +708,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
    tvOS home-screen language: a large rounded card whose artwork fills
    the tile, the focused card lifting (scale + strong shadow + white
    ring) while the others sit flatter and dimmer. Device Photos gets the
-   full treatment plus a subtle focus halo: the focused device's
+   full treatment plus a strong focus halo: the focused device's
    pre-rendered backdrop on a separate .focus-bg layer under .bg/.home,
-   centred on the focused tile and faded to transparent at its edges by
-   a radial-gradient mask (instant swap, no animation), so the glow is
-   local to the card and the theme background shows through at the
-   edges. (A baked-alpha PNG halo would do the same job; the mask is
-   used because it needs no new image files, and this codebase already
-   uses -webkit-mask-image/mask-image for the shelf and list fades.)
+   centred on the focused tile and faded to transparent at its far edges
+   by a radial-gradient mask (instant swap, no animation). The halo is
+   deliberately wide — a 1920x880 layer with a 940x420 mask ellipse,
+   full strength out to 60% of the ellipse — so the glow clearly
+   extends behind the neighbouring cards, not just inside the focused
+   one, while still fading out before the screen edges and keeping the
+   hero above clean. (A baked-alpha PNG halo would do the same job; the
+   mask is used because it needs no new image files, and this codebase
+   already uses -webkit-mask-image/mask-image for the shelf and list
+   fades.)
    Futuristic gets the same cards with a cyan lift, but keeps its
    nebula background — a halo there would fight the theme. Art Mode
    Overlay keeps its JFK photo as the background, so it gets only the
    lift and shadow, no card art and no halo. Minimal stays text-only
    and 90s TV keeps its bevelled plastic buttons; neither is touched
    here. */
-.focus-bg{position:absolute;left:0;top:0;width:1600px;height:760px;background-size:cover;background-position:center;opacity:0;pointer-events:none;-webkit-mask-image:radial-gradient(ellipse 700px 330px at center,#000 0%,#000 45%,transparent 100%);mask-image:radial-gradient(ellipse 700px 330px at center,#000 0%,#000 45%,transparent 100%)}
+.focus-bg{position:absolute;left:0;top:0;width:1920px;height:880px;background-size:cover;background-position:center;opacity:0;pointer-events:none;-webkit-mask-image:radial-gradient(ellipse 940px 420px at center,#000 0%,#000 60%,transparent 100%);mask-image:radial-gradient(ellipse 940px 420px at center,#000 0%,#000 60%,transparent 100%)}
 .focus-bg.is-on{opacity:1}
 .card-art{display:none;position:absolute;left:0;top:0;width:100%;height:100%;border-radius:inherit;background-size:cover;background-position:center}
 .th-devices .tile .card-art,.th-future .tile .card-art{display:block}

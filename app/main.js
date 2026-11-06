@@ -1380,20 +1380,25 @@
     if (Date.now() < dockEdgeUntil) dockEdgeFrame = window.requestAnimationFrame(trackDockEdges);
   }
 
-  /* Subtle focus halo (Device Photos theme only): the focused device's
-     pre-rendered backdrop, shown as a localised glow centred on the
-     focused tile — not a full-screen swap. The .focus-bg layer is
-     1600x760 and the CSS radial-gradient mask fades it to transparent
-     at its edges, so the theme's own .scene background shows through at
-     the screen edges and the hero above stays clean. HALO_W/H must
-     match the .focus-bg size in style.css (and the mask radii there).
-     A baked-alpha PNG version can replace the mask later
-     (.local/make-card-art.py already generates *-halo.png); the mask
-     is used now because it needs no new image files. Instant swap, no
-     animation on the TV path. Cleared whenever focus leaves the tiles,
-     the layout is not Dock, or another theme is active; a missing file
-     leaves the layer off and nothing breaks. */
-  var HALO_W = 1600, HALO_H = 760;
+  /* Strong focus halo (Device Photos theme only): the focused device's
+     pre-rendered backdrop, shown as a wide glow centred on the focused
+     tile — not a full-screen swap, but clearly extending behind the
+     neighbouring cards too. The .focus-bg layer is 1920x880 and the
+     CSS radial-gradient mask (ellipse 940x420, full strength to 60%)
+     fades it to transparent at its far edges, so the theme's own .scene
+     background still shows through at the screen edges and the hero
+     above stays clean: at the hero's bottom edge the mask is already
+     ~85% faded, and above that it is fully transparent. The layer is as
+     wide as the stage, so for an end tile part of it is clipped
+     off-screen — the glow centre stays on the focused tile either way.
+     HALO_W/H must match the .focus-bg size in style.css (and the mask
+     radii there). A baked-alpha PNG version can replace the mask later
+     (.local/make-card-art.py already generates *-halo.png at the same
+     geometry); the mask is used now because it needs no new image files.
+     Instant swap, no animation on the TV path. Cleared whenever focus
+     leaves the tiles, the layout is not Dock, or another theme is active;
+     a missing file leaves the layer off and nothing breaks. */
+  var HALO_W = 1920, HALO_H = 880;
   function applyFocusBackdrop(focusItem, tileFocus, g) {
     var a = null, url = '', cy;
     if (S.c.preset === 'devices' && S.c.layout === 'dock' && top().id === 'home' && tileFocus && focusItem && focusItem.kind === 'app') a = app(focusItem.id);

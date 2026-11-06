@@ -123,12 +123,13 @@ strip are not focusable.
   PS5 Slim + controller, a floodlit stadium behind the Sky Q box — with
   the transparent photo of the actual box on top. The focused card lifts
   (slightly larger, strong drop shadow, white ring) while the others sit
-  flatter and dimmer, and a subtle halo follows focus: that device's
-  pre-rendered backdrop on a 1600x760 layer, centred on the focused
-  tile and faded to transparent at its edges by a CSS radial-gradient
-  mask (gone about 500px past the card edge), so the glow is local to
-  the card and the theme background shows through at the screen edges
-  while the hero above stays clean (instant swap, no animation). The
+  flatter and dimmer, and a wide halo follows focus: that device's
+  pre-rendered backdrop, brightened to about three-quarters, on a
+  1920x880 layer centred on the focused tile and faded to transparent
+  at its far edges by a CSS radial-gradient mask (ellipse 940x420,
+  full strength to 60%), so the glow clearly extends behind the
+  neighbouring cards while still fading out before the screen edges
+  and keeping the hero above clean (instant swap, no animation). The
   PNGs, card art and backdrops are local-only, installed by
   `scripts/apply-oliver-assets.py` from `.local/oliver-devices/` and
   `.local/oliver-cards/` (made by `.local/make-card-art.py` from
