@@ -38,12 +38,26 @@ it and used it there.
   36px) and bigger device photos. The dock sits a little higher so the
   tiles are not so low on the screen. Three tiles plus Art Mode / All apps
   / Settings and the clock still fit 1920×1080 with no clipping or overlap.
+- **A hero at the top of every theme, and a Tonight strip under the
+  dock.** The 24-hour clock is now big (enlarged by a transform, so the
+  measured digit widths still work), with today's date and a
+  time-appropriate greeting ("Good morning, Oliver") underneath, so the
+  top half of the screen is no longer empty. The Tonight strip names each
+  box and its HDMI port, or that a port still needs picking ("Tonight:
+  Apple TV 4K · HDMI 2 — PS5 · pick a port — Sky · pick a port"). The
+  strip is hidden in the 90s TV theme, where the TV set's bottom band
+  occupies that strip. Tiles were not made bigger again — the hero, the
+  strip and the backgrounds fill the space instead.
 - **Backgrounds for the four non-Art themes (see below).** Minimal gets
-  your Petty #43 B&W photo dimmed right down; Device Photos gets a dark
-  shelf gradient; Futuristic gets a pre-rendered nebula/grid; 90s TV gets
-  a muted Memphis wash. Art Mode Overlay is unchanged (JFK photo
-  full-screen). Each background is one pre-rendered 1920×1080 JPEG — no
-  live blur, no animation, so it stays fast on Tizen.
+  your Petty #43 B&W photo, now bright enough to actually see (about half
+  brightness, was about a third); Device Photos gets a lit dark gradient
+  with a brighter shelf glow; Futuristic gets a brighter nebula and a
+  stronger perspective grid; 90s TV gets a brighter Memphis wash inside
+  the CRT glass. Art Mode Overlay is unchanged (JFK photo full-screen).
+  Each background is one pre-rendered 1920×1080 JPEG — no live blur, no
+  animation, so it stays fast on Tizen. (A bug in the background maker was
+  also fixed: its vignette was darkening the centre of every background
+  instead of the edges, which is why they all read as a dark void.)
 - **A clear route back.** Settings → Samsung has Samsung Home, TV settings
   and Inputs. The remote's Back key always works.
 
@@ -58,9 +72,9 @@ look changes in one save. Your choice is remembered across restarts.
 
 1. **Minimal Black & White** — the fresh-install default. Monochrome only,
    no photo wallpaper, text-only tiles, a plain white outline around the
-   focused tile. Background: your Petty #43 B&W photo, dimmed to about a
-   third and darkened further behind the tile row so the white labels stay
-   readable. Still calm, still monochrome.
+   focused tile. Background: your Petty #43 B&W photo, dimmed to about
+   half and darkened further behind the tile row so the white labels stay
+   readable — the car is clearly visible now. Still calm, still monochrome.
 2. **Device Photos** — each Home tile shows a photo of the actual box
    (Apple TV 4K + remote, PS5 Slim + controller, Sky Q box) on a dark
    gradient background with a soft shelf glow behind the tile row, so the
@@ -70,13 +84,21 @@ look changes in one save. Your choice is remembered across restarts.
    clouds, stars, a glowing horizon and a faint perspective grid), cyan
    glass focus plate and clock glow. Static paint only, no animation, still
    readable from the sofa.
-4. **90s TV** — retro CRT/VHS feel: a muted Memphis-pattern background
-   (soft magenta circle, teal triangle, yellow shapes) in the same
-   magenta/teal/yellow palette, magenta and purple focus plate with a
-   chunky teal border, yellow menus, uppercase labels, a teal frame around
-   the screen and static scanlines. The type stays the bundled sans — a real
-   pixel font would break the TV's measured label widths, so the retro feel
-   comes from colour, borders and scanlines.
+4. **90s TV** — a physical 90s CRT television set filling the whole
+   screen: chunky plastic bezel with rounded corners, speaker grilles down
+   both sides, corner screws, a CLEANFRAME brand badge, a red power button
+   with a red standby LED, a VHS slot, a tuning knob and CH/VOL buttons
+   along the bottom, and the launcher living inside the curved CRT glass.
+   Inside the glass: the muted Memphis-pattern background (soft magenta
+   circle, teal triangle, yellow shapes), a green channel OSD ("CH 03 ·
+   AV1"), stronger scanlines, a vignette and a slight glass reflection,
+   and chunky bevelled plastic tiles with drop shadows and uppercase
+   labels in the same magenta/purple/teal/yellow palette. The type stays
+   the bundled sans — a real pixel font would break the TV's measured
+   label widths, so the retro feel comes from the set, the colours and the
+   glass, not the typeface. The bezel is a local-only PNG (see below);
+   without it the theme falls back to the Memphis background with
+   scanlines.
 5. **Art Mode Overlay** — the JFK diner photo fills the screen and the
    launcher sits on top as a minimal overlay. Unfocused tiles dim so the
    photo reads as art when idle. If the local-only photos are not installed
@@ -127,6 +149,13 @@ public; committing them would publish them.
   into `app/assets/theme-backgrounds/`. If a background file is missing,
   that theme falls back to its flat colour/gradient — the launcher never
   breaks on a missing background.
+- CRT bezel for the 90s TV theme (1 PNG): `.local/oliver-retro/` with
+  `MANIFEST.json`. Made by `.local/make-retro-bezel.py` (Pillow, drawn
+  procedurally — bezel, grilles, screws, badge, power button, LED, VHS
+  slot, knob, CH/VOL buttons — with the glass cut out to transparent).
+  Installed by the same apply script into
+  `app/assets/theme-backgrounds/retro-bezel.png`. Also local-only and never
+  committed.
 - Install: `python3 scripts/apply-oliver-assets.py`
 - Check state: `python3 scripts/apply-oliver-assets.py --check`
 - Remove: `python3 scripts/apply-oliver-assets.py --remove`
@@ -288,22 +317,26 @@ Home/startup change as a separate decision with its own recovery plan.
   device tests).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures** (upstream suite plus the new Theme group checks).
-- `.local/verify-oliver.mjs` (own checks) — **59/59 passed**: fresh install
+- `.local/verify-oliver.mjs` (own checks) — **81/81 passed**: fresh install
   (Minimal Black & White, dark Dock, three HDMI tiles in order, 24-hour
-  clock, JFK wallpaper), HDMI mapping (chooser names the device, picking
-  HDMI 2 calls `setSource(2)`, mapping saved and survives reload, mapped
-  tile switches directly), all four photo wallpapers render, and all five
-  themes applied through the real Settings UI (look values, stage class,
-  device PNGs loading, gradient/scanline/photo checks, theme backgrounds
-  loading at 1920×1080, the new larger tile sizes with device photos
-  scaled up, persistence back on Home and across reload).
+  clock, JFK wallpaper), hero (today's date, time-appropriate greeting,
+  clock enlarged by transform) and Tonight strip (names all three boxes,
+  shows "pick a port" unmapped and "HDMI 2" once mapped), HDMI mapping
+  (chooser names the device, picking HDMI 2 calls `setSource(2)`, mapping
+  saved and survives reload, mapped tile switches directly), all four photo
+  wallpapers render, and all five themes applied through the real Settings
+  UI (look values, stage class, device PNGs loading, gradient/scanline/
+  photo checks, theme backgrounds loading at 1920×1080, the new larger
+  tile sizes with device photos scaled up, hero + Tonight strip in every
+  theme, CRT bezel/OSD/bevelled tiles/glass effects in the 90s TV theme,
+  persistence back on Home and across reload).
 - `npm run check:public` — passed (bounded secret audit; see below).
 - Public export built from a clean checkout (photos removed first):
   `dist/CleanFrame-public-unsigned.wgt`, SHA-256
-  `9732faecb4fb833cc424b54945db2ef4c875022f88274763d0afd0711db9f3a3`,
-  15,787,863 bytes, 152 entries, only the 15 upstream wallpapers, no
-  Oliver photos, no device photos and no theme backgrounds. The themes and
-  the bigger tiles are in the package (checked: `PRESETS` in `main.js`,
-  theme classes and background rules in `style.css`, `tw: 400` in the dock
-  geometry).
+  `23421ac34ba8113ec9d31d7efbf3f7c88b8dfcbd30f4bfd3dfc5c857f86d58cf`,
+  15,789,826 bytes, 152 entries, only the 15 upstream wallpapers, no
+  Oliver photos, no device photos, no theme backgrounds and no CRT bezel.
+  The themes, the hero, the Tonight strip and the bigger tiles are in the
+  package (checked: `PRESETS` in `main.js`, theme classes and background
+  rules in `style.css`, `tw: 400` in the dock geometry).
   Unsigned — signing needs your Samsung account and Mac.

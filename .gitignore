@@ -67,3 +67,4 @@ PP*.woff2
 # Same rule: local-only, never committed to the public fork.
 /app/assets/devices/*.png
 /app/assets/theme-backgrounds/*.jpg
+/app/assets/theme-backgrounds/*.png

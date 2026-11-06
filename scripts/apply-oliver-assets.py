@@ -11,10 +11,12 @@ his personal photos.
 
 Prepared files live in the gitignored folders `.local/oliver-wallpapers/`
 (28 files: background, thumbnail, panel backdrop and the four registered
-glass materials per photo), `.local/oliver-devices/` (3 transparent PNGs)
-and `.local/oliver-backgrounds/` (4 JPEGs, made by
+glass materials per photo), `.local/oliver-devices/` (3 transparent PNGs),
+`.local/oliver-backgrounds/` (4 JPEGs, made by
 `.local/make-backgrounds.py` from his Frame-art originals and Pillow
-procedural art), each with a MANIFEST.json of sizes and SHA-256 hashes.
+procedural art) and `.local/oliver-retro/` (1 PNG: the chunky CRT TV set
+for the 90s TV theme, made by `.local/make-retro-bezel.py`, glass cut out
+to transparent), each with a MANIFEST.json of sizes and SHA-256 hashes.
 Those folders are local-only: they are made on Oliver's Mac from his own
 Frame-art collection in `~/workspace/your_files/frame-art/` (see
 OLIVER-HANDOVER.md), and they are never pushed to GitHub.
@@ -48,6 +50,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WALLPAPER_SOURCE = ROOT / '.local/oliver-wallpapers'
 DEVICE_SOURCE = ROOT / '.local/oliver-devices'
 BACKGROUND_SOURCE = ROOT / '.local/oliver-backgrounds'
+RETRO_SOURCE = ROOT / '.local/oliver-retro'
 WALLPAPERS = ROOT / 'app/assets/wallpapers'
 MATERIALS = ROOT / 'app/assets/materials'
 DEVICES = ROOT / 'app/assets/devices'
@@ -75,6 +78,11 @@ DEVICE_FILES = ['appletv-4k.png', 'ps5-slim.png', 'sky-q.png']
 # colour/gradient, so a missing background never breaks the launcher.
 BACKGROUND_FILES = ['minimal-bg.jpg', 'devices-bg.jpg', 'future-bg.jpg', 'retro-bg.jpg']
 
+# 90s TV theme: the CRT set itself, painted over the stage with the glass
+# cut out to transparent. If it is missing, the theme falls back to the
+# Memphis background with CSS scanlines only.
+RETRO_FILES = ['retro-bezel.png']
+
 
 def wallpaper_files():
     for id_, _name in PHOTOS:
@@ -91,6 +99,11 @@ def device_files():
 
 def background_files():
     for name in BACKGROUND_FILES:
+        yield name, BACKGROUNDS
+
+
+def retro_files():
+    for name in RETRO_FILES:
         yield name, BACKGROUNDS
 
 
@@ -205,6 +218,21 @@ def install():
         print('No theme backgrounds in ' + str(BACKGROUND_SOURCE)
               + '; installing wallpapers only. Run python3 .local/make-backgrounds.py'
               + ' to make them; the four non-Art themes fall back to flat colours until then.')
+    retro_ok = RETRO_SOURCE.is_dir()
+    if retro_ok:
+        missing, bad = verify_source(RETRO_SOURCE, list(retro_files()))
+        if missing:
+            print('Missing prepared files in ' + str(RETRO_SOURCE) + ': ' + ', '.join(missing))
+            return 1
+        if bad:
+            print('Files do not match MANIFEST.json (re-prepare them): ' + ', '.join(bad))
+            return 1
+        for name, dest in retro_files():
+            dest.mkdir(parents=True, exist_ok=True)
+            (dest / name).write_bytes((RETRO_SOURCE / name).read_bytes())
+    else:
+        print('No CRT bezel in ' + str(RETRO_SOURCE)
+              + '; the 90s TV theme falls back to the Memphis background with CSS scanlines.')
     sources_path = WALLPAPERS / 'SOURCES.json'
     entries = json.loads(sources_path.read_text())
     have = {entry['id'] for entry in entries}
@@ -215,7 +243,8 @@ def install():
         catalog_path.write_text(catalog_text.replace(marker, marker + catalog_block(), 1))
     print('Installed ' + str(len(list(wallpaper_files()))) + ' prepared wallpaper files'
           + (' and ' + str(len(DEVICE_FILES)) + ' device photos.' if devices_ok else '.')
-          + (' Theme backgrounds: ' + ('installed.' if backgrounds_ok else 'not prepared.')))
+          + (' Theme backgrounds: ' + ('installed.' if backgrounds_ok else 'not prepared.'))
+          + (' CRT bezel: ' + ('installed.' if retro_ok else 'not prepared.')))
     if added:
         print('Added to SOURCES.json: ' + ', '.join(entry['id'] for entry in added))
     print('Catalogue entries: ' + ', '.join(IDS))
@@ -225,7 +254,7 @@ def install():
 
 def remove():
     removed = 0
-    for name, dest in list(wallpaper_files()) + list(device_files()) + list(background_files()):
+    for name, dest in list(wallpaper_files()) + list(device_files()) + list(background_files()) + list(retro_files()):
         path = dest / name
         if path.is_file():
             path.unlink()
@@ -284,7 +313,17 @@ def check():
     print('Theme background source: ' + ('present' if bg_source_ok else 'not prepared (themes fall back to flat colours)'))
     print('Installed theme backgrounds: ' + str(len(bg_installed)) + '/' + str(len(BACKGROUND_FILES)) + bg_note)
     backgrounds_ok = (not bg_source_ok) or (len(bg_installed) == len(BACKGROUND_FILES) and not _bm and not _bb)
-    return 0 if (wallpapers_ok and devices_ok and backgrounds_ok) else 1
+    retro_source_ok = RETRO_SOURCE.is_dir()
+    _rm, _rb = ([] if not retro_source_ok
+                else verify_source(RETRO_SOURCE, list(retro_files())))
+    retro_installed = [name for name, dest in retro_files() if (dest / name).is_file()]
+    retro_note = ''
+    if retro_source_ok and (_rm or _rb):
+        retro_note = '; manifest mismatches: ' + ', '.join(_rm + _rb)
+    print('CRT bezel source: ' + ('present' if retro_source_ok else 'not prepared (90s TV theme falls back to CSS scanlines)'))
+    print('Installed CRT bezel: ' + str(len(retro_installed)) + '/' + str(len(RETRO_FILES)) + retro_note)
+    retro_ok = (not retro_source_ok) or (len(retro_installed) == len(RETRO_FILES) and not _rm and not _rb)
+    return 0 if (wallpapers_ok and devices_ok and backgrounds_ok and retro_ok) else 1
 
 
 def main():

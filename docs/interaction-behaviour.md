@@ -103,6 +103,17 @@ before; it does not clear the stored preset, so Settings keeps showing the
 last theme chosen. Saved profiles from before themes existed have no preset
 and show as Custom.
 
+Every theme on the Dock home has a hero at the top: the 24-hour clock
+enlarged by a transform (the clock stays 48px in the layout, because its
+digit cells are measured at that size), today's date, and a time-appropriate
+greeting. Below the dock, a Tonight strip names each Home box and its HDMI
+port, or that a port still needs picking ("Tonight: Apple TV 4K · HDMI 2 —
+PS5 · pick a port — Sky · pick a port"). The strip is Dock-only and hidden
+in the 90s TV theme, where the CRT bezel occupies that strip of screen.
+Tiles were not made bigger again to fill the space; the backgrounds, hero
+and strip do that instead. Remote navigation is unchanged: the hero and the
+strip are not focusable.
+
 - Minimal Black & White is monochrome only: a dimmed Petty #43 B&W photo
   as the background (darkened further behind the tile row), text-only
   tiles, a plain white focus outline instead of a glass plate.
@@ -115,11 +126,23 @@ and show as Custom.
 - Futuristic is a static neon/glass look: a pre-rendered dark nebula
   background (cyan/purple clouds, stars, glowing horizon, faint perspective
   grid), cyan focus plate and clock glow. No live blur, no animation.
-- 90s TV is a retro CRT/VHS look: a muted Memphis-pattern background in
-  bright magenta, teal and yellow, chunky focus borders, uppercase labels
-  and a static scanline overlay. The type stays the bundled sans (a pixel
-  font would break the measured label geometry), so the retro feel comes
-  from colour, borders and scanlines.
+- 90s TV is a physical 90s CRT television set filling the whole screen:
+  a pre-rendered 1920x1080 PNG of a chunky plastic bezel (speaker grilles,
+  corner screws, brand badge, red power button and standby LED, VHS slot,
+  tuning knob, CH/VOL buttons) with the glass cut out to transparent, so
+  the launcher lives inside the CRT glass. Inside the glass: the muted
+  Memphis-pattern background, a stronger scanline overlay with a vignette
+  and a diagonal glass reflection, a green channel OSD ("CH 03 · AV1") and
+  chunky bevelled plastic tiles with drop shadows and uppercase labels in
+  the magenta/purple/teal/yellow palette. The caption and utils move inside
+  the glass; the Tonight strip is hidden because the bezel's bottom band
+  occupies that strip. The bezel PNG is local-only, made by
+  `.local/make-retro-bezel.py` and installed by
+  `scripts/apply-oliver-assets.py` from `.local/oliver-retro/`; without it
+  the theme falls back to the Memphis background with CSS scanlines only.
+  The type stays the bundled sans (a pixel font would break the measured
+  label geometry), so the retro feel comes from the set, the colours and
+  the glass, not the typeface.
 - Art Mode Overlay fills the screen with the JFK diner photo (or the
   current wallpaper if the local-only photos are not installed) and puts the
   launcher on top as a minimal overlay: unfocused tiles dim so the photo
@@ -130,10 +153,13 @@ uses live blur or backdrop filters. The four non-Art themes paint one
 pre-rendered 1920x1080 JPEG on the `.scene` layer, local-only and installed
 by `scripts/apply-oliver-assets.py` from `.local/oliver-backgrounds/`
 (made by `.local/make-backgrounds.py`); if a background file is missing,
-that theme falls back to its flat colour/gradient. Home tiles are 400x280
-in icon+label mode and 400x140 in text mode, with the dock bottom at y=880
-on the 1920x1080 stage; remote navigation and the browser checks are
-unaffected.
+that theme falls back to its flat colour/gradient. The backgrounds are
+deliberately bright enough to read as a picture, not a void: the vignette
+helper in `.local/make-backgrounds.py` darkens the edges, never the centre
+(an earlier version had it backwards and dimmed the middle of every
+background). Home tiles are 400x280 in icon+label mode and 400x140 in text
+mode, with the dock bottom at y=880 on the 1920x1080 stage; remote
+navigation and the browser checks are unaffected.
 
 ## HDMI shortcuts (Oliver fork)
 

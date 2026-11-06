@@ -37,6 +37,13 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 /* Caption: the clock, or the name of the mode Home is in */
 .caption{position:absolute;left:140px;top:72px;display:flex;flex-direction:column;max-width:1040px}
 .clock,.cap-title{font-size:48px;line-height:64px;font-weight:500;letter-spacing:-1.5px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.22)}
+/* Hero (Dock home only): the clock is enlarged by a transform, not by
+   font-size, because its digit cells are measured at 48px. The date and
+   greeting lines below it fill the top half of the screen. */
+.l-dock .caption{max-width:1200px}
+.l-dock .caption .clock{display:inline-block;transform:scale(1.85);transform-origin:0 50%;margin:30px 0 34px}
+.l-dock .caption .hero-date{display:block;font-size:56px;line-height:64px;font-weight:600;letter-spacing:-.5px;margin-top:18px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+.l-dock .caption .hero-line{display:block;font-size:34px;line-height:44px;font-weight:500;color:rgba(255,255,255,.88);margin-top:8px;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,.45)}
 .clock{font-variant-numeric:tabular-nums}
 .cap-line{max-width:100%;font-size:30px;line-height:40px;font-weight:500;letter-spacing:-.2px;color:rgba(255,255,255,.88);text-shadow:0 1px 2px rgba(0,0,0,.3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .warn{display:inline-flex;align-items:flex-start;color:var(--warn)}
@@ -144,6 +151,12 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .dock-action.is-on{opacity:1;pointer-events:auto}
 .dock-action.is-focus{background:var(--solid);color:var(--solid-ink)}
 .dock-action>span{display:block;max-width:100%;padding:0 20px;overflow:hidden;text-overflow:ellipsis}
+/* Tonight strip: one line under the dock naming each Home box and its
+   HDMI port (or that a port still needs picking). Dock only, hidden in
+   List layout, arrange mode and while a sheet is open. */
+.tonight{position:absolute;left:140px;right:140px;bottom:36px;text-align:center;font-size:30px;line-height:40px;font-weight:500;letter-spacing:-.2px;color:rgba(255,255,255,.78);text-shadow:0 1px 2px rgba(0,0,0,.4);pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:none}
+.l-dock .tonight{display:block}
+.l-list .tonight,.at-arrange .tonight,.is-sheet .tonight{display:none}
 .l-list .dock,.l-list .cue,.l-list .dock-action{display:none}
 
 /* Shared whole-row cues for the app library and two-column editor. */
@@ -643,7 +656,7 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
    the Minimal theme draws its focus ring on the tile itself instead. */
 .th-minimal .tile.is-focus{box-shadow:inset 0 0 0 3px rgba(255,255,255,.9)}
 .th-minimal .mat::after{box-shadow:none}
-.th-minimal .mat-veil{background:rgba(8,14,18,.30)}
+.th-minimal .mat-veil{background:rgba(8,14,18,.22)}
 .th-minimal .tile .mark,.th-minimal .tile .label{opacity:.92}
 .th-minimal .scene{background:#0d0d0d url("assets/theme-backgrounds/minimal-bg.jpg") center/cover no-repeat}
 .th-devices{background:#0d1113}
@@ -663,7 +676,30 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .th-retro .tile .label,.th-retro .ph-name{text-transform:uppercase;letter-spacing:.5px}
 .th-retro .clock{color:#00e5d4;text-shadow:3px 3px 0 #ff2e88}
 .th-retro .quiet-utils .u{color:#ffd500}
-.th-retro::before{content:"";position:absolute;left:0;top:0;right:0;bottom:0;box-shadow:inset 0 0 0 10px #000,inset 0 0 0 14px #00b3a4;pointer-events:none;z-index:59}
-.th-retro::after{content:"";position:absolute;left:0;top:0;width:1920px;height:1080px;background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 2px,transparent 2px 4px);pointer-events:none;z-index:60}
+.th-retro .hero-date{color:#ffd500}
+.th-retro .hero-line{color:#00e5d4}
+.th-retro .tonight{display:none}
+/* The CRT set: a pre-rendered 1920x1080 PNG of a chunky 90s TV (bezel,
+   speaker grilles, corner screws, brand badge, power button, red standby
+   LED, VHS slot, tuning knob, CH/VOL buttons) with the glass cut out to
+   transparent. The launcher lives inside the glass, so in Dock layout
+   the caption and utils move in from the screen edges and the channel
+   OSD sits top-right of the glass. Hidden while a sheet or the
+   appearance panel is open, so the TV frame never covers a dialog. */
+.crt-frame{display:none;position:absolute;left:0;top:0;width:1920px;height:1080px;background:url("assets/theme-backgrounds/retro-bezel.png") center/cover no-repeat;pointer-events:none;z-index:58}
+.th-retro .crt-frame{display:block}
+.crt-osd{display:none;position:absolute;right:230px;top:132px;font-size:34px;font-weight:700;letter-spacing:6px;color:#7dffce;text-shadow:0 0 14px rgba(125,255,206,.65);pointer-events:none;z-index:57}
+.th-retro.l-dock .crt-osd{display:block}
+.th-retro.l-dock .caption{left:200px;top:124px}
+.th-retro.l-dock .utils{top:196px;right:200px}
+.th-retro.l-dock .util-focus-label{top:264px!important}
+.at-appearance .crt-frame,.at-appearance .crt-osd,.is-sheet .crt-frame,.is-sheet .crt-osd{display:none}
+/* Chunky bevelled plastic 90s buttons with drop shadows. */
+.th-retro .tile{border-radius:20px;background:linear-gradient(180deg,#3d3d48,#232329);box-shadow:0 6px 0 #0e0e12,0 12px 22px rgba(0,0,0,.55),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -4px 0 rgba(0,0,0,.55)}
+.th-retro .tile.is-focus{background:linear-gradient(180deg,#4a2a5e,#2c1840);box-shadow:0 6px 0 #0e0e12,0 0 32px rgba(255,46,136,.35),inset 0 2px 0 rgba(255,255,255,.4),inset 0 -4px 0 rgba(0,0,0,.55)}
+.th-retro .tile .label{text-shadow:0 2px 0 rgba(0,0,0,.6)}
+/* CRT glass: vignette, a diagonal glass reflection and stronger scanlines. */
+.th-retro::before{display:none}
+.th-retro::after{content:"";position:absolute;left:0;top:0;width:1920px;height:1080px;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.45) 100%),linear-gradient(115deg,rgba(255,255,255,.10) 0%,rgba(255,255,255,.03) 18%,transparent 30%),repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 2px,transparent 2px 3px);pointer-events:none;z-index:60}
 .th-art .mat-veil{background:rgba(8,14,18,.06)}
 .th-art .tile:not(.is-focus) .mark,.th-art .tile:not(.is-focus) .label{opacity:.55}

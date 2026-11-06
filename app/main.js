@@ -1108,7 +1108,7 @@
   var stage = $('stage'), homeEl = $('home'), caption = $('caption'), utilsEl = $('utils');
   var utilFocusLabel = $('utilFocusLabel'), utilFocusKey = '', appFocusName = $('appFocusName');
   var dock = $('dock'), shelf = $('shelf'), track = $('track'), plate = $('plate'), matScrim = $('matScrim'), dockEmpty = $('dockEmpty');
-  var cueL = $('cueL'), cueR = $('cueR'), dockAction = $('dockAction');
+  var cueL = $('cueL'), cueR = $('cueR'), dockAction = $('dockAction'), tonight = $('tonight');
   var focusStatus = $('focusStatus'), sceneEl = $('scene'), appearanceEl = $('appearance'), appearanceRows = $('appearanceRows'), appearanceDesc = $('appearanceDesc');
   var appearanceBack = $('appearanceBack'), appearanceTitle = $('appearanceTitle'), appearanceStatus = $('appearanceStatus');
   var phScene = $('phScene'), phPlate = $('phPlate'), phField = $('phField'), phList = $('phList'), phRows = $('phRows'), phAction = $('phAction'), phEmpty = $('phEmpty');
@@ -1180,6 +1180,7 @@
     var hs = homeState(t);
     renderCaption(t, hs);
     renderUtils(hs);
+    renderTonight(hs);
     if (S.c.layout === 'list') renderList(hs);
     else { photoMode = null; renderDock(hs); }
     renderAppFocusName(hs);
@@ -1195,10 +1196,52 @@
     if (!metrics || !metrics.digitCell) return text;
     return text.replace(/[0-9]/g, function (digit) { return '<span class="clock-digit">' + digit + '</span>'; });
   }
+  var WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  function greetingFor(hour) {
+    if (hour < 5) return 'Good night';
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  }
   function renderCaption(t, hs) {
-    var html = '<span class="clock">' + clockHtml() + '</span>';
+    var html = '<span class="clock">' + clockHtml() + '</span>', d;
+    // Hero: on the Dock home the caption is a big clock, the date and a
+    // greeting, so the top half of the screen is not empty. The clock
+    // stays 48px in the layout (its digit cells are measured at that size)
+    // and is enlarged by a transform in CSS instead.
+    if (t.id === 'home' && S.c.layout === 'dock') {
+      d = new Date();
+      html += '<span class="hero-date">' + WEEKDAYS[d.getDay()] + ' ' + d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + '</span>';
+      html += '<span class="hero-line">' + greetingFor(d.getHours()) + ', Oliver</span>';
+    }
     if (S.c.apps !== 'icons' && hs.items[hs.i] && (S.c.layout === 'list' ? photoLabel(hs.items[hs.i].id, false).size < 88 || photoLabel(hs.items[hs.i].id, false).ellipsis : hs.zone === 'apps' && reducedDockLabel(hs.items[hs.i].id))) html += '<span class="cap-line full-name">' + esc(app(hs.items[hs.i].id).name) + '</span>';
     setHTML(caption, html);
+  }
+  var tonightKey = '';
+  function renderTonight(hs) {
+    // Footer strip under the dock: what is on tonight, and which HDMI port
+    // each box is on (or that a port still needs picking). Dock only; the
+    // strip is hidden in List layout and in the 90s TV theme, where the
+    // CRT bezel occupies that strip of screen.
+    var parts = [], key, port, a;
+    if (S.c.layout !== 'dock' || !hs.items.length) {
+      if (tonightKey) { tonightKey = ''; setHTML(tonight, ''); }
+      return;
+    }
+    hs.items.forEach(function (it) {
+      a = app(it.id);
+      if (!a) return;
+      // Names go into innerHTML, so escape them: a catalogue name can
+      // contain markup (the browser suite pins one called
+      // 'Family <img src=x ...> & TV' to prove exactly this).
+      if (a.hdmi) {
+        port = S.c.hdmi ? S.c.hdmi[it.id] : undefined;
+        parts.push(esc(a.name) + ' \u00b7 ' + (typeof port === 'number' ? 'HDMI ' + port : 'pick a port'));
+      } else parts.push(esc(a.name));
+    });
+    key = parts.join(' \u2014 ');
+    if (key !== tonightKey) { tonightKey = key; setHTML(tonight, key ? 'Tonight: ' + key : ''); }
   }
 
   function utilBtn(z, i, action, inner, extra, name) {
