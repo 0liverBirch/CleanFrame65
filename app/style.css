@@ -113,14 +113,14 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .monogram span{position:relative;width:1.65em;height:1.65em;display:flex;align-items:center;justify-content:center;border-radius:.4em}.monogram span::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;border:2px solid currentColor;border-radius:inherit;opacity:.38}
 .native-icon img{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;object-fit:contain}
 .native-icon.has-native-icon>span{visibility:hidden}
-.tile .mark{position:absolute;left:84px;top:34px;opacity:.84;transition:opacity 160ms linear,transform var(--t) var(--ease)}
-.tile .label{position:absolute;left:4px;right:4px;top:128px;text-align:center;font-size:36px;line-height:44px;letter-spacing:-.8px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.84;transition:opacity 160ms linear}
+.tile .mark{position:absolute;left:110px;top:40px;opacity:.84;transition:opacity 160ms linear,transform var(--t) var(--ease)}
+.tile .label{position:absolute;left:4px;right:4px;top:168px;text-align:center;font-size:44px;line-height:54px;letter-spacing:-.8px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.84;transition:opacity 160ms linear}
 .tile .t-name{position:absolute;left:12px;right:12px;top:72px;text-align:center;font-size:40px;line-height:56px;letter-spacing:-1px;font-weight:600;white-space:nowrap;overflow:hidden;opacity:.84;transition:opacity 160ms linear}
 .tile.is-focus .mark,.tile.is-focus .label,.tile.is-focus .t-name,.tile.is-lifted .mark,.tile.is-lifted .label,.tile.is-lifted .t-name{opacity:1}
 .tile.is-focus .mark,.tile.is-lifted .mark{transform:translateY(-3px) scale(1.04)}
 .tile.is-sel .mark,.tile.is-sel .label,.tile.is-sel .t-name{opacity:.94}
 .tile.k-ph .mark,.tile.k-ph .label,.tile.k-ph.is-focus .mark,.tile.k-ph.is-focus .label{opacity:.5;transform:none}
-.tile .add{position:absolute;left:116px;top:40px;width:56px;height:56px;opacity:.84}
+.tile .add{position:absolute;left:50%;margin-left:-28px;top:40px;width:56px;height:56px;opacity:.84}
 .tile .add .ico{width:56px;height:56px;stroke-width:1.4}
 .tile.is-focus .add{opacity:1}
 .tile.is-full .add,.tile.is-full .label{opacity:.5}
@@ -554,9 +554,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
 .dock .tile,.dock .plate{width:var(--tile-w);height:var(--tile-h)}
 .dock .track{height:var(--dock-h)}
 .dock .nudge{top:var(--nudge-top)}
-.a-text .tile .label{left:12px;right:12px;top:28px;font-size:40px;line-height:48px;font-weight:600}
+.a-text .tile .label{left:12px;right:12px;top:44px;font-size:48px;line-height:56px;font-weight:600}
 .a-text .label-ink{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:top}
-.a-icons .tile .mark{left:20px;top:28px}
+.a-icons .tile .mark{left:32px;top:44px}
 .a-text .ph-name,.a-text .ph-list.is-compact .ph-name{left:28px}
 .a-icons .ph-group .mark{top:20px}
 .a-icons .ph-list.is-compact .ph-group .mark{top:12px}
@@ -641,19 +641,23 @@ html,body{width:100%;height:100%;overflow:hidden;background:#000}
    here is static paint, so the TV stays fast. */
 /* Type focus hides the dock plate upstream (.f-type .plate{opacity:0}), so
    the Minimal theme draws its focus ring on the tile itself instead. */
-.th-minimal .tile.is-focus{box-shadow:inset 0 0 0 2px rgba(255,255,255,.9)}
+.th-minimal .tile.is-focus{box-shadow:inset 0 0 0 3px rgba(255,255,255,.9)}
 .th-minimal .mat::after{box-shadow:none}
 .th-minimal .mat-veil{background:rgba(8,14,18,.30)}
 .th-minimal .tile .mark,.th-minimal .tile .label{opacity:.92}
+.th-minimal .scene{background:#0d0d0d url("assets/theme-backgrounds/minimal-bg.jpg") center/cover no-repeat}
 .th-devices{background:#0d1113}
-.th-devices .tile .mark{left:24px!important;top:10px!important;width:240px!important;height:108px!important}
+.th-devices .scene{background:#0d1113 url("assets/theme-backgrounds/devices-bg.jpg") center/cover no-repeat}
+.th-devices .tile .mark{left:30px!important;top:12px!important;width:340px!important;height:150px!important}
 .th-devices .device-photo img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain}
 .th-future{background:linear-gradient(160deg,#0b1c26 0%,#101b2e 55%,#160f2e 100%)}
+.th-future .scene{background:#101b2e url("assets/theme-backgrounds/future-bg.jpg") center/cover no-repeat}
 .th-future{--solid:#8ef1ff;--solid-ink:#06222b;--plate:linear-gradient(170deg,rgba(0,229,255,.34),rgba(0,229,255,.12) 58%,rgba(0,229,255,.20));--plate-edge:inset 0 1px 0 rgba(140,240,255,.5)}
 .th-future .plate.on-focus{box-shadow:0 0 28px rgba(0,229,255,.28),var(--plate-edge)}
 .th-future .clock{color:#d8f7ff;text-shadow:0 0 18px rgba(0,229,255,.45),0 1px 3px rgba(0,0,0,.22)}
 .th-future .tile .label{color:#e8fbff}
 .th-retro{background:#14101e}
+.th-retro .scene{background:#14101e url("assets/theme-backgrounds/retro-bg.jpg") center/cover no-repeat}
 .th-retro{--solid:#ffd500;--solid-ink:#14101e}
 .th-retro .plate.on-focus{background:linear-gradient(170deg,#ff2e88,#7a2eff);box-shadow:0 0 0 4px #00e5d4}
 .th-retro .tile .label,.th-retro .ph-name{text-transform:uppercase;letter-spacing:.5px}

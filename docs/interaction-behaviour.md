@@ -103,28 +103,37 @@ before; it does not clear the stored preset, so Settings keeps showing the
 last theme chosen. Saved profiles from before themes existed have no preset
 and show as Custom.
 
-- Minimal Black & White is monochrome only: dark background, text-only
+- Minimal Black & White is monochrome only: a dimmed Petty #43 B&W photo
+  as the background (darkened further behind the tile row), text-only
   tiles, a plain white focus outline instead of a glass plate.
 - Device Photos shows a transparent photo of the actual box on each Home
-  tile (Apple TV 4K + remote, PS5 Slim + controller, Sky Q box) on a plain
-  dark background. The PNGs are local-only, installed by
-  `scripts/apply-oliver-assets.py` from `.local/oliver-devices/`; if they
-  are missing, the tiles fall back to their labels and navigation is
-  unaffected.
-- Futuristic is a static neon/glass look: a dark gradient background, cyan
-  focus plate and clock glow. No live blur, no animation.
-- 90s TV is a retro CRT/VHS look: bright magenta, teal and yellow, chunky
-  focus borders, uppercase labels and a static scanline overlay. The type
-  stays the bundled sans (a pixel font would break the measured label
-  geometry), so the retro feel comes from colour, borders and scanlines.
+  tile (Apple TV 4K + remote, PS5 Slim + controller, Sky Q box) on a dark
+  gradient background with a soft shelf glow behind the dock row. The PNGs
+  are local-only, installed by `scripts/apply-oliver-assets.py` from
+  `.local/oliver-devices/`; if they are missing, the tiles fall back to
+  their labels and navigation is unaffected.
+- Futuristic is a static neon/glass look: a pre-rendered dark nebula
+  background (cyan/purple clouds, stars, glowing horizon, faint perspective
+  grid), cyan focus plate and clock glow. No live blur, no animation.
+- 90s TV is a retro CRT/VHS look: a muted Memphis-pattern background in
+  bright magenta, teal and yellow, chunky focus borders, uppercase labels
+  and a static scanline overlay. The type stays the bundled sans (a pixel
+  font would break the measured label geometry), so the retro feel comes
+  from colour, borders and scanlines.
 - Art Mode Overlay fills the screen with the JFK diner photo (or the
   current wallpaper if the local-only photos are not installed) and puts the
   launcher on top as a minimal overlay: unfocused tiles dim so the photo
   reads as art when idle.
 
 Theme styling is static CSS under the `th-<preset>` stage class; it never
-uses live blur or backdrop filters, and it does not change tile geometry, so
-remote navigation and the browser checks are unaffected.
+uses live blur or backdrop filters. The four non-Art themes paint one
+pre-rendered 1920x1080 JPEG on the `.scene` layer, local-only and installed
+by `scripts/apply-oliver-assets.py` from `.local/oliver-backgrounds/`
+(made by `.local/make-backgrounds.py`); if a background file is missing,
+that theme falls back to its flat colour/gradient. Home tiles are 400x280
+in icon+label mode and 400x140 in text mode, with the dock bottom at y=880
+on the 1920x1080 stage; remote navigation and the browser checks are
+unaffected.
 
 ## HDMI shortcuts (Oliver fork)
 

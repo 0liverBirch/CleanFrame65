@@ -33,6 +33,17 @@ it and used it there.
   local-only and never committed (see "Your photos and device photos").
 - **Device photos for the Device Photos theme.** Transparent PNGs of the
   actual boxes (see "Device photos — what they are").
+- **Bigger Home tiles.** Tiles are 400×280 (was 288×200) in icon+label
+  mode, 400×140 in text mode (Minimal), with bigger labels (44px, was
+  36px) and bigger device photos. The dock sits a little higher so the
+  tiles are not so low on the screen. Three tiles plus Art Mode / All apps
+  / Settings and the clock still fit 1920×1080 with no clipping or overlap.
+- **Backgrounds for the four non-Art themes (see below).** Minimal gets
+  your Petty #43 B&W photo dimmed right down; Device Photos gets a dark
+  shelf gradient; Futuristic gets a pre-rendered nebula/grid; 90s TV gets
+  a muted Memphis wash. Art Mode Overlay is unchanged (JFK photo
+  full-screen). Each background is one pre-rendered 1920×1080 JPEG — no
+  live blur, no animation, so it stays fast on Tizen.
 - **A clear route back.** Settings → Samsung has Samsung Home, TV settings
   and Inputs. The remote's Back key always works.
 
@@ -47,14 +58,21 @@ look changes in one save. Your choice is remembered across restarts.
 
 1. **Minimal Black & White** — the fresh-install default. Monochrome only,
    no photo wallpaper, text-only tiles, a plain white outline around the
-   focused tile, lots of empty space.
+   focused tile. Background: your Petty #43 B&W photo, dimmed to about a
+   third and darkened further behind the tile row so the white labels stay
+   readable. Still calm, still monochrome.
 2. **Device Photos** — each Home tile shows a photo of the actual box
-   (Apple TV 4K + remote, PS5 Slim + controller, Sky Q box) on a plain dark
-   background. Needs the local-only device photos installed (below); without
-   them the tiles fall back to their labels.
-3. **Futuristic** — dark gradient background, cyan glass focus plate and
-   clock glow. Static paint only, no animation, still readable from the sofa.
-4. **90s TV** — retro CRT/VHS feel: magenta and purple focus plate with a
+   (Apple TV 4K + remote, PS5 Slim + controller, Sky Q box) on a dark
+   gradient background with a soft shelf glow behind the tile row, so the
+   boxes do not float in a void. Needs the local-only device photos
+   installed (below); without them the tiles fall back to their labels.
+3. **Futuristic** — pre-rendered dark nebula background (cyan and purple
+   clouds, stars, a glowing horizon and a faint perspective grid), cyan
+   glass focus plate and clock glow. Static paint only, no animation, still
+   readable from the sofa.
+4. **90s TV** — retro CRT/VHS feel: a muted Memphis-pattern background
+   (soft magenta circle, teal triangle, yellow shapes) in the same
+   magenta/teal/yellow palette, magenta and purple focus plate with a
    chunky teal border, yellow menus, uppercase labels, a teal frame around
    the screen and static scanlines. The type stays the bundled sans — a real
    pixel font would break the TV's measured label widths, so the retro feel
@@ -82,7 +100,7 @@ repo): `.local/qa/themes/theme-minimal.png`,
 ```sh
 cd ~/workspace/cleanframe-oliver   # or wherever you cloned the fork
 npm ci
-python3 scripts/apply-oliver-assets.py   # installs your photos + device photos (below)
+python3 scripts/apply-oliver-assets.py   # installs your photos, device photos and theme backgrounds (below)
 npm run dev:public
 ```
 
@@ -102,6 +120,13 @@ public; committing them would publish them.
   `MANIFEST.json` (sizes + SHA-256).
 - Prepared device photos (3 PNGs): `.local/oliver-devices/` with
   `MANIFEST.json`.
+- Prepared theme backgrounds (4 JPEGs): `.local/oliver-backgrounds/` with
+  `MANIFEST.json`. Made by `.local/make-backgrounds.py` (Pillow): Minimal
+  from your Petty #43 B&W original in `~/workspace/your_files/frame-art/`,
+  the other three drawn procedurally. Installed by the same apply script
+  into `app/assets/theme-backgrounds/`. If a background file is missing,
+  that theme falls back to its flat colour/gradient — the launcher never
+  breaks on a missing background.
 - Install: `python3 scripts/apply-oliver-assets.py`
 - Check state: `python3 scripts/apply-oliver-assets.py --check`
 - Remove: `python3 scripts/apply-oliver-assets.py --remove`
@@ -114,10 +139,12 @@ photos are installed would contain them. The copied files are covered by
 accident. The script verifies every file against its manifest before
 copying; if a file is missing or changed it refuses and says which one.
 
-If you clone the fork fresh on another Mac, make these two `.local/`
+If you clone the fork fresh on another Mac, make these three `.local/`
 folders there first: the wallpapers are prepared from your Frame-art
-originals in `~/workspace/your_files/frame-art/` (JFK diner first), and the
-device photos are the three PNGs in `.local/oliver-devices/`. The
+originals in `~/workspace/your_files/frame-art/` (JFK diner first), the
+device photos are the three PNGs in `.local/oliver-devices/`, and the theme
+backgrounds are made by `python3 .local/make-backgrounds.py` (needs the
+Petty #43 B&W original in the Frame-art folder). The
 preparation steps are in `.local/cutout-devices.py` (device photos) and the
 earlier wallpaper preparation used Pillow `ImageOps.fit` to 1920×1080 plus
 upstream `node scripts/build-materials.mjs`.

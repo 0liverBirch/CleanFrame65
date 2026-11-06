@@ -61,4 +61,9 @@ PP*.woff2
 # Oliver's Device Photos (Apple TV 4K, PS5 Slim, Sky Q box): transparent PNGs
 # prepared locally by scripts/apply-oliver-assets.py from .local/oliver-devices/.
 # Same rule: local-only, never committed to the public fork.
+# Oliver's theme backgrounds (Minimal / Devices / Futuristic / 90s TV):
+# 1920x1080 JPEGs made locally by .local/make-backgrounds.py, installed by
+# scripts/apply-oliver-assets.py from .local/oliver-backgrounds/.
+# Same rule: local-only, never committed to the public fork.
 /app/assets/devices/*.png
+/app/assets/theme-backgrounds/*.jpg

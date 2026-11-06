@@ -1,19 +1,23 @@
-"""Install Oliver's personal assets into a local checkout: Frame-art wallpapers
-and Device Photos for the Device Photos theme.
+"""Install Oliver's personal assets into a local checkout: Frame-art wallpapers,
+Device Photos for the Device Photos theme, and theme backgrounds.
 
 The four photos (JFK at the diner, Mustang at the villa, Superbird in the
-desert, Petty #43) and the three device photos (Apple TV 4K + remote, PS5
-Slim + controller, Sky Q box) are Oliver's own images. They are NOT in this
-repository: this fork is public, and committing them would publish his
-personal photos.
+desert, Petty #43), the three device photos (Apple TV 4K + remote, PS5
+Slim + controller, Sky Q box) and the four theme backgrounds (Petty #43 B&W
+dimmed for Minimal, dark shelf gradient for Device Photos, nebula/grid for
+Futuristic, Memphis wash for 90s TV) are Oliver's own images. They are NOT
+in this repository: this fork is public, and committing them would publish
+his personal photos.
 
 Prepared files live in the gitignored folders `.local/oliver-wallpapers/`
 (28 files: background, thumbnail, panel backdrop and the four registered
-glass materials per photo) and `.local/oliver-devices/` (3 transparent PNGs),
-each with a MANIFEST.json of sizes and SHA-256 hashes. Those folders are
-local-only: they are made on Oliver's Mac from his own Frame-art collection
-in `~/workspace/your_files/frame-art/` (see OLIVER-HANDOVER.md), and they are
-never pushed to GitHub.
+glass materials per photo), `.local/oliver-devices/` (3 transparent PNGs)
+and `.local/oliver-backgrounds/` (4 JPEGs, made by
+`.local/make-backgrounds.py` from his Frame-art originals and Pillow
+procedural art), each with a MANIFEST.json of sizes and SHA-256 hashes.
+Those folders are local-only: they are made on Oliver's Mac from his own
+Frame-art collection in `~/workspace/your_files/frame-art/` (see
+OLIVER-HANDOVER.md), and they are never pushed to GitHub.
 
 Usage, from the repository root:
 
@@ -43,9 +47,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 WALLPAPER_SOURCE = ROOT / '.local/oliver-wallpapers'
 DEVICE_SOURCE = ROOT / '.local/oliver-devices'
+BACKGROUND_SOURCE = ROOT / '.local/oliver-backgrounds'
 WALLPAPERS = ROOT / 'app/assets/wallpapers'
 MATERIALS = ROOT / 'app/assets/materials'
 DEVICES = ROOT / 'app/assets/devices'
+BACKGROUNDS = ROOT / 'app/assets/theme-backgrounds'
 
 PHOTOS = [
     ('jfk-diner', 'JFK at the diner'),
@@ -64,6 +70,11 @@ MATERIAL_FILES = ['{id}-field-blur.jpg', '{id}-field-frost.jpg',
 # Device Photos theme: transparent PNGs of the actual boxes, one per tile.
 DEVICE_FILES = ['appletv-4k.png', 'ps5-slim.png', 'sky-q.png']
 
+# Theme backgrounds: one 1920x1080 JPEG per non-Art theme, painted on the
+# .scene layer. If a file is missing, that theme falls back to its flat
+# colour/gradient, so a missing background never breaks the launcher.
+BACKGROUND_FILES = ['minimal-bg.jpg', 'devices-bg.jpg', 'future-bg.jpg', 'retro-bg.jpg']
+
 
 def wallpaper_files():
     for id_, _name in PHOTOS:
@@ -76,6 +87,11 @@ def wallpaper_files():
 def device_files():
     for name in DEVICE_FILES:
         yield name, DEVICES
+
+
+def background_files():
+    for name in BACKGROUND_FILES:
+        yield name, BACKGROUNDS
 
 
 def file_hash(path):
@@ -173,6 +189,22 @@ def install():
         for name, dest in device_files():
             dest.mkdir(parents=True, exist_ok=True)
             (dest / name).write_bytes((DEVICE_SOURCE / name).read_bytes())
+    backgrounds_ok = BACKGROUND_SOURCE.is_dir()
+    if backgrounds_ok:
+        missing, bad = verify_source(BACKGROUND_SOURCE, list(background_files()))
+        if missing:
+            print('Missing prepared files in ' + str(BACKGROUND_SOURCE) + ': ' + ', '.join(missing))
+            return 1
+        if bad:
+            print('Files do not match MANIFEST.json (re-prepare them): ' + ', '.join(bad))
+            return 1
+        for name, dest in background_files():
+            dest.mkdir(parents=True, exist_ok=True)
+            (dest / name).write_bytes((BACKGROUND_SOURCE / name).read_bytes())
+    else:
+        print('No theme backgrounds in ' + str(BACKGROUND_SOURCE)
+              + '; installing wallpapers only. Run python3 .local/make-backgrounds.py'
+              + ' to make them; the four non-Art themes fall back to flat colours until then.')
     sources_path = WALLPAPERS / 'SOURCES.json'
     entries = json.loads(sources_path.read_text())
     have = {entry['id'] for entry in entries}
@@ -182,7 +214,8 @@ def install():
     if START_MARKER not in catalog_text:
         catalog_path.write_text(catalog_text.replace(marker, marker + catalog_block(), 1))
     print('Installed ' + str(len(list(wallpaper_files()))) + ' prepared wallpaper files'
-          + (' and ' + str(len(DEVICE_FILES)) + ' device photos.' if devices_ok else '.'))
+          + (' and ' + str(len(DEVICE_FILES)) + ' device photos.' if devices_ok else '.')
+          + (' Theme backgrounds: ' + ('installed.' if backgrounds_ok else 'not prepared.')))
     if added:
         print('Added to SOURCES.json: ' + ', '.join(entry['id'] for entry in added))
     print('Catalogue entries: ' + ', '.join(IDS))
@@ -192,7 +225,7 @@ def install():
 
 def remove():
     removed = 0
-    for name, dest in list(wallpaper_files()) + list(device_files()):
+    for name, dest in list(wallpaper_files()) + list(device_files()) + list(background_files()):
         path = dest / name
         if path.is_file():
             path.unlink()
@@ -241,7 +274,17 @@ def check():
     print('Device photo source: ' + ('present' if device_source_ok else 'not prepared (theme falls back to monograms)'))
     print('Installed device photos: ' + str(len(device_installed)) + '/' + str(len(DEVICE_FILES)) + device_note)
     devices_ok = (not device_source_ok) or (len(device_installed) == len(DEVICE_FILES) and not _dm and not _db)
-    return 0 if (wallpapers_ok and devices_ok) else 1
+    bg_source_ok = BACKGROUND_SOURCE.is_dir()
+    _bm, _bb = ([] if not bg_source_ok
+                else verify_source(BACKGROUND_SOURCE, list(background_files())))
+    bg_installed = [name for name, dest in background_files() if (dest / name).is_file()]
+    bg_note = ''
+    if bg_source_ok and (_bm or _bb):
+        bg_note = '; manifest mismatches: ' + ', '.join(_bm + _bb)
+    print('Theme background source: ' + ('present' if bg_source_ok else 'not prepared (themes fall back to flat colours)'))
+    print('Installed theme backgrounds: ' + str(len(bg_installed)) + '/' + str(len(BACKGROUND_FILES)) + bg_note)
+    backgrounds_ok = (not bg_source_ok) or (len(bg_installed) == len(BACKGROUND_FILES) and not _bm and not _bb)
+    return 0 if (wallpapers_ok and devices_ok and backgrounds_ok) else 1
 
 
 def main():
