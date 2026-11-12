@@ -632,9 +632,10 @@ Home/startup change as a separate decision with its own recovery plan.
 
 - You asked for everything to match your repo name, CleanFrame65, and
   confirmed I have access. Done in one commit on `oliver-launcher`
-  (see "Checks run" above for the new export SHA) and pushed to your
-  fork — see "### 1. Push the branch to your fork" for the verified
-  remote HEAD.
+  (see "Checks run" above for the new export SHA). The push to your
+  fork is the one remaining step and is blocked in this environment —
+  see "### 1. Push the branch to your fork" for exactly why and how
+  to finish it from a credentialed machine.
 - Git remotes in this checkout: `origin` is now
   `https://github.com/0liverBirch/CleanFrame65.git` (was upstream
   `nthnclrk/CleanFrame`), and a new `upstream` remote points at
