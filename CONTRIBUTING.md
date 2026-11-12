@@ -1,6 +1,6 @@
-# Contributing to CleanFrame
+# Contributing to CleanFrame65
 
-CleanFrame was built for one Samsung The Frame, with very little work on portability. Use it at your own risk and treat it as a starting point for your own version. Forks and adaptations are encouraged. Contributions back to this repo should keep the remote experience simple and state what has actually been tested.
+CleanFrame65 was built for one Samsung The Frame, with very little work on portability. Use it at your own risk and treat it as a starting point for your own version. Forks and adaptations are encouraged. Contributions back to this repo should keep the remote experience simple and state what has actually been tested.
 
 ## Start in the browser
 
@@ -32,4 +32,4 @@ Keep passwords, tokens, signing keys, serial numbers, DUIDs, addresses and origi
 
 ## Assets and licences
 
-CleanFrame's original code is MIT. Contributions to that code use the same licence. Keep upstream asset licences and source records intact. Add only assets you have permission to redistribute, and explain any required attribution or separate terms. Personal paid fonts stay under `.local/`; the public app must work without them. Review `THIRD_PARTY_NOTICES.md` before adding or replacing a logo, photograph or font.
+CleanFrame65's code is MIT. Contributions to that code use the same licence. Keep upstream asset licences and source records intact. Add only assets you have permission to redistribute, and explain any required attribution or separate terms. Personal paid fonts stay under `.local/`; the public app must work without them. Review `THIRD_PARTY_NOTICES.md` before adding or replacing a logo, photograph or font.

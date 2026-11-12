@@ -125,7 +125,7 @@ private source-activation payload or claiming CEC wake support.
 
 ## Native Art Mode notes
 
-The local-photo rotation belongs to Samsung's Art app, rather than CleanFrame.
+The local-photo rotation belongs to Samsung's Art app, rather than CleanFrame65.
 Selecting an individual photo can cancel rotation. After a photo-selection or
 upload check, reapply the intended category, interval, and shuffle choice, then
 read them back. The reported device used a 15-minute shuffled local-photo set.

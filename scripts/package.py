@@ -89,7 +89,7 @@ def main(root=ROOT):
     password = read_password(settings['password_file'], root=root) if settings['password_file'] else None
     dist = root / 'dist'
     dist.mkdir(exist_ok=True)
-    unsigned = dist / 'CleanFrame-unsigned.wgt'
+    unsigned = dist / 'CleanFrame65-unsigned.wgt'
     write_widget_archive(unsigned, root=root, identity=settings['identity'])
     # A fresh folder prevents a previous signed widget masking a failed build.
     signed_dir = Path(tempfile.mkdtemp(prefix='signed-', dir=dist))
@@ -98,7 +98,7 @@ def main(root=ROOT):
         raise ValueError('SDK signing failed. Check the selected profile and password access in Certificate Manager.')
     signed = signed_dir / unsigned.name
     check_signed_widget(signed, settings['identity'])
-    target = dist / 'CleanFrame.wgt'
+    target = dist / 'CleanFrame65.wgt'
     # Promote on the same filesystem so a failed copy preserves the last build.
     ready = signed_dir / 'validated.wgt'
     ready.write_bytes(signed.read_bytes())

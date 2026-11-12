@@ -1,12 +1,12 @@
-# CleanFrame
+# CleanFrame65
 
 A quieter home screen for Samsung The Frame. Your apps, a photograph and the time, with an interface made for the TV remote.
 
-![CleanFrame browser preview using the bundled Manrope font](docs/images/cleanframe-dock.jpg)
+![CleanFrame65 browser preview using the bundled Manrope font](docs/images/cleanframe-dock.jpg)
 
 I built CleanFrame for one TV: my own Samsung The Frame, running Tizen. I'm sharing the code and setup notes as a starting point for other people to build on.
 
-> **Oliver's fork.** This checkout is Oliver Birch's fork (`0liverBirch/CleanFrame65`, branch `oliver-launcher`). It keeps the upstream behaviour except for the changes listed in `OLIVER-HANDOVER.md`: a 24-hour clock, a fresh-install Dock of HDMI shortcuts for his Apple TV 4K, PS5 and Sky boxes (ports are picked on the TV and remembered, never assumed), five switchable themes in Settings (the fresh-install default is Minimal Black & White), and four of his own Frame-art photos as local-only wallpapers. His photos and signing certificates are never committed to this public fork; the wallpapers and device photos are installed locally with `python3 scripts/apply-oliver-assets.py` from the gitignored `.local/oliver-wallpapers/` and `.local/oliver-devices/` folders.
+> **Oliver's fork.** This checkout is Oliver Birch's fork (`0liverBirch/CleanFrame65`, branch `oliver-launcher`), forked from [nthnclrk/CleanFrame](https://github.com/nthnclrk/CleanFrame) (MIT), the original project. It keeps the upstream behaviour except for the changes listed in `OLIVER-HANDOVER.md`: a 24-hour clock, a fresh-install Dock of HDMI shortcuts for his Apple TV 4K, PS5 and Sky boxes (ports are picked on the TV and remembered, never assumed), five switchable themes in Settings (the fresh-install default is Minimal Black & White), and four of his own Frame-art photos as local-only wallpapers. His photos and signing certificates are never committed to this public fork; the wallpapers and device photos are installed locally with `python3 scripts/apply-oliver-assets.py` from the gitignored `.local/oliver-wallpapers/` and `.local/oliver-devices/` folders.
 
 **Use it at your own risk.** The web launcher targets Tizen 5.0 and later for installation, with [owner reports](docs/compatibility.md) across several models. That minimum is not a promise that every device flow is verified. The TV setup scripts and native Home helpers still reflect specific computers and firmware, so adapt them and test on your own hardware.
 
@@ -17,8 +17,8 @@ I highly recommend forking it and building on top of it, ideally with a coding a
 You need Node.js 22.13+ (22 LTS), or 24+, and Python 3.10+ to run the browser preview.
 
 ```sh
-git clone https://github.com/nthnclrk/CleanFrame.git
-cd CleanFrame
+git clone https://github.com/0liverBirch/CleanFrame65.git
+cd CleanFrame65
 npm ci
 npm run dev:public
 ```
@@ -44,7 +44,7 @@ Open this repo in a local coding agent and give it a bounded change:
 
 ```text
 Read AGENTS.md, docs/development.md and docs/interaction-behaviour.md.
-Help me adapt CleanFrame. Start with the public-font browser preview.
+Help me adapt CleanFrame65. Start with the public-font browser preview.
 My first change is: <describe one change>.
 Preserve remote navigation, saved preferences and the ES5 runtime.
 Run the source checks and relevant browser checks. Show the result.
@@ -85,7 +85,7 @@ npm run check:public
 npm run export:public
 ```
 
-`npm run check`, including its `check:device` command, runs only source checks and synthetic device-adapter tests. It never connects to a TV. The browser checks use isolated Chromium profiles and a loopback preview. They never contact a TV. The public export creates `dist/CleanFrame-public-unsigned.wgt`, with public fonts and notices. It needs your own identity and signing before installation. It does not certify asset redistribution rights or device compatibility.
+`npm run check`, including its `check:device` command, runs only source checks and synthetic device-adapter tests. It never connects to a TV. The browser checks use isolated Chromium profiles and a loopback preview. They never contact a TV. The public export creates `dist/CleanFrame65-public-unsigned.wgt`, with public fonts and notices. It needs your own identity and signing before installation. It does not certify asset redistribution rights or device compatibility.
 
 | Location | Purpose |
 | --- | --- |
@@ -104,6 +104,6 @@ Fork it, experiment and build something that suits your TV. If you find a useful
 
 CleanFrame's original code and documentation use the [MIT licence](LICENSE). Fonts, photographs and logos retain their own terms; read [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Paid Pangram binaries are excluded from Git and public exports. A local package may include them, so keep personal builds separate from public downloads.
 
-The [release review](docs/public-release.md) records the publication checks. Third-party assets retain the terms listed in their notices. CleanFrame is an independent project with no Samsung or streaming-service affiliation.
+The [release review](docs/public-release.md) records the publication checks. Third-party assets retain the terms listed in their notices. CleanFrame65 is an independent project with no Samsung or streaming-service affiliation.
 
-[TV Detox](https://github.com/Ansub/tv-detox) is a useful example of making an agent-assisted TV project approachable. Its Android setup is a different implementation; the prompts and instructions here are written for CleanFrame and Tizen.
+[TV Detox](https://github.com/Ansub/tv-detox) is a useful example of making an agent-assisted TV project approachable. Its Android setup is a different implementation; the prompts and instructions here are written for CleanFrame65 and Tizen.

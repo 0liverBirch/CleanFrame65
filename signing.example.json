@@ -2,6 +2,6 @@
   "sdk_path": "/PATH/TO/YOUR/tizen-studio",
   "profile": "YOUR_CERTIFICATE_PROFILE",
   "package_id": "YOUR_SDK_GENERATED_PACKAGE_ID",
-  "app_id": "YOUR_SDK_GENERATED_PACKAGE_ID.CleanFrame",
+  "app_id": "YOUR_SDK_GENERATED_PACKAGE_ID.CleanFrame65",
   "password_file": null
 }

@@ -29,7 +29,7 @@ it and used it there.
   on Minimal Black & White: dark Dock, text-only tiles, no photo wallpaper.
 - **Your photos as wallpapers.** JFK at the diner (your favourite), Mustang
   at the villa, Superbird in the desert, Petty #43. Prepared at 1920×1080
-  with the pre-rendered glass materials CleanFrame needs. They are
+  with the pre-rendered glass materials CleanFrame65 needs. They are
   local-only and never committed (see "Your photos and device photos").
 - **Device photos for the Device Photos theme.** Transparent PNGs of the
   actual boxes (see "Device photos — what they are"), now sitting on rich
@@ -346,7 +346,7 @@ and **Sky**. The ports are then remembered per tile.
 
 ### 5. How to delete it
 
-TV: Home → Apps → App Settings → select CleanFrame → Delete. That removes
+TV: Home → Apps → App Settings → select CleanFrame65 → Delete. That removes
 the app only; it does not touch anything else on the TV.
 
 ### 6. SKIP the Home-button remap — for now
@@ -398,7 +398,7 @@ Home/startup change as a separate decision with its own recovery plan.
   device tests).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures** (upstream suite plus the new Theme group checks).
-- `.local/verify-oliver.mjs` (own checks) — **117/117 passed**: fresh install
+- `.local/verify-oliver.mjs` (own checks) — **119/119 passed**: fresh install
   (Minimal Black & White, dark Dock, three HDMI tiles in order, 24-hour
   clock, JFK wallpaper), hero (today's date, time-appropriate greeting,
   clock enlarged by transform) and Tonight strip (names all three boxes,
@@ -424,12 +424,16 @@ Home/startup change as a separate decision with its own recovery plan.
   Oliver's real product photos (12 Nov 2026 — see "Device photos" below);
   a check reads their corners off a canvas and pins their sizes
   (Apple TV 827×814, PS5 Slim 621×199, Sky Stream 1000×480), so a
-  white-background photo can never slip back in unnoticed.
+  white-background photo can never slip back in unnoticed. Two more
+  checks pin the CleanFrame65 rename (12 Nov 2026, see below): the
+  display name is CleanFrame65 in `app/config.xml`, the index title
+  and `package.json`, and the Tizen application identity
+  (`nClrkHome1.FrameHome`) is unchanged.
 - `npm run check:public` — passed (bounded secret audit; see below).
 - Public export built from a clean checkout (photos removed first):
-  `dist/CleanFrame-public-unsigned.wgt`, SHA-256
-  `94a97d73dba8a62284e9d36b0b68a1ad1143f91a671fa1259b238908882a3cd6`,
-  15,792,260 bytes, 152 entries, only the 15 upstream wallpapers, no
+  `dist/CleanFrame65-public-unsigned.wgt`, SHA-256
+  `793440b057bf579d2d3c22cdc4ccb2be8847fd5be957e29b1788e41f6cb17256`,
+  15,792,279 bytes, 152 entries, only the 15 upstream wallpapers, no
   Oliver photos, no device photos, no theme backgrounds and no CRT bezel.
   The themes, the hero, the Tonight strip, the bigger tiles, the card
   code and the halo are in the package (checked: `PRESETS`, `focusBg`,
@@ -590,6 +594,72 @@ Home/startup change as a separate decision with its own recovery plan.
   and visually checked — the Slim is a clean cutout with no white halo
   in Device Photos, Futuristic, Art Mode and the 90s CRT buttons.
   Committed locally on `oliver-launcher` (still NOT pushed).
+
+### Rename to CleanFrame65 (12 Nov 2026) — repo now matches your fork name
+
+- You asked for everything to match your repo name, CleanFrame65, and
+  confirmed I have access. Done in one commit on `oliver-launcher`
+  (see "Checks run" above for the new export SHA) and pushed to your
+  fork — see "### 1. Push the branch to your fork" for the verified
+  remote HEAD.
+- Git remotes in this checkout: `origin` is now
+  `https://github.com/0liverBirch/CleanFrame65.git` (was upstream
+  `nthnclrk/CleanFrame`), and a new `upstream` remote points at
+  `https://github.com/nthnclrk/CleanFrame.git`, so upstream pulls
+  still work. Branch: https://github.com/0liverBirch/CleanFrame65/tree/oliver-launcher
+- Renamed (user-visible): `app/config.xml` `<name>` and
+  `app/index.html` `<title>` → CleanFrame65; `package.json` /
+  `package-lock.json` name → `cleanframe65`; README title, clone URL
+  (`git clone https://github.com/0liverBirch/CleanFrame65.git`,
+  `cd CleanFrame65`) and the agent prompt template, with an explicit
+  upstream attribution line crediting nthnclrk/CleanFrame (MIT) as the
+  original; AGENTS.md, CONTRIBUTING.md and RELEASE_NOTES.md titles;
+  the public export filename → `dist/CleanFrame65-public-unsigned.wgt`
+  (and the local signed package → `dist/CleanFrame65.wgt` in
+  `scripts/package.py`, `scripts/tv.py`, `scripts/test-tools.py`);
+  user-visible strings in `app/device.js` ("Open CleanFrame65 on the
+  TV…"); the preview printout; the `signing.example.json` app-id
+  example suffix; and the matching lines in the docs and in this
+  handover. Two new verify checks pin the display name (see above).
+- Deliberately kept, and why:
+  - Tizen application id/package `nClrkHome1.FrameHome` in
+    `app/config.xml` — the docs require the stable identity
+    (`docs/development.md`: packaging must not change the
+    maintainer's identity; changing an installed app's identity
+    creates a different application). Nothing has been installed on
+    your TV yet, so a rename would be technically possible, but the
+    house rule is to keep it stable and your signing certificates
+    will be generated against it. Display name only.
+  - Internal JS globals (`window.CleanFrameWallpapers`,
+    `window.CleanFrameAdaptiveInk`, `window.CleanFramePrivateFontIDs`)
+    and the saved-preference keys (`cleanframe.home.v1`,
+    `cleanframe.shore.v1`) — code identifiers, not user-visible;
+    renaming the keys would orphan your saved preferences.
+  - The `CLEANFRAME_PUBLIC_FONTS` env var and the native-Home helper
+    markers (`CLEANFRAME_HOME_*`, `CleanFrameHomeControl.dll`,
+    `entry_point:cleanframe_home`) — cross-file identifiers in the
+    upstream helper; renaming them is a separate device-helper task,
+    not a display rename.
+  - Upstream history and attribution: the README's first-person
+    "I built CleanFrame" line (Nathan's voice), the upstream release
+    link (your fork has no release yet — that is where a prebuilt
+    widget actually exists), the MIT licence line crediting
+    CleanFrame's original code, `THIRD_PARTY_NOTICES.md`,
+    `app/assets/icons/SOURCES.json` provenance ("CleanFrame original
+    utility outline"), and the historical records in
+    `docs/compatibility.md`, `docs/tv-status.md`,
+    `docs/public-release.md`, `docs/agent-tv-setup-guide.md` and
+    `docs/asset-sources.md` (upstream PR/issue links and contributor
+    reports — renaming them would break links and falsify history).
+  - The working-copy folder name `cleanframe-oliver/` and the
+    `docs/images/cleanframe-dock.jpg` filename — paths, not the app
+    name.
+- Checks after the rename: `npm run check` passed, `npm run
+  check:tools` passed (15 tests), verify 119/119 (was 117; the two
+  new checks are the display name and the unchanged app identity),
+  browser suite 432/0, `check:public` passed, public export rebuilt
+  from an assets-removed state under the new filename (SHA above),
+  assets reinstalled 28/28, 3/3, 4/4, 1/1, 6/6.
 
 ### VM filesystem breakage, 6 Nov 2026 ~10:41–12:14 — recovered
 

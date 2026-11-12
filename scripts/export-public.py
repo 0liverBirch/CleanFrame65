@@ -7,7 +7,7 @@ import zipfile
 from font_assets import ROOT, write_widget_archive
 from private_files import check_widget
 
-output = ROOT / 'dist/CleanFrame-public-unsigned.wgt'
+output = ROOT / 'dist/CleanFrame65-public-unsigned.wgt'
 output.parent.mkdir(exist_ok=True)
 write_widget_archive(output, include_private=False)
 with zipfile.ZipFile(output, 'a', zipfile.ZIP_DEFLATED) as archive:

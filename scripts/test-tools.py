@@ -247,7 +247,7 @@ with zipfile.ZipFile(target, 'a') as archive:
             with contextlib.redirect_stdout(io.StringIO()) as output:
                 package.main(self.root)
             self.assertNotIn('synthetic secret', output.getvalue())
-            target = self.root / 'dist/CleanFrame.wgt'
+            target = self.root / 'dist/CleanFrame65.wgt'
             baseline = target.read_bytes()
             (cli.parent / 'mismatch').write_text('Synthetic identity mismatch')
             with self.assertRaisesRegex(ValueError, 'identity differs'):
@@ -365,7 +365,7 @@ with zipfile.ZipFile(target, 'a') as archive:
         sdb.chmod(0o700)
         self.config(sdk_path=str(sdb.parents[1]), profile='Synthetic profile', package_id='AbCdEf1234', app_id='AbCdEf1234.MyHome')
         (self.root / '.local/device.json').write_text(json.dumps({'host': '127.0.0.1'}))
-        widget = self.root / 'dist/CleanFrame.wgt'
+        widget = self.root / 'dist/CleanFrame65.wgt'
         widget.parent.mkdir()
         for contaminated in [None, 'private.pfx', '.BUILDRESULT/copy.txt']:
             with zipfile.ZipFile(widget, 'w') as archive:

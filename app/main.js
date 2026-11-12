@@ -1,4 +1,4 @@
-/* CleanFrame Home. Static materials, local preferences and public Tizen app controls. */
+/* CleanFrame65 Home. Static materials, local preferences and public Tizen app controls. */
 (function () {
   'use strict';
 

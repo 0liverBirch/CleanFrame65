@@ -1,6 +1,6 @@
-# CleanFrame 0.7.0
+# CleanFrame65 0.7.0
 
-CleanFrame remains a starting point to fork and adapt for your own Samsung TV.
+CleanFrame65 remains a starting point to fork and adapt for your own Samsung TV.
 
 - The web launcher's installation minimum is now Tizen 5.0. Contributor results are recorded by model, firmware and tested flow; the minimum does not establish native Home support or complete verification on every TV.
 - Settings → Samsung → Inputs lists the HDMI ports reported by the TV, including disconnected inputs that may contain sleeping devices. Selection errors stay visible, and cancelled or timed-out requests cannot start later switching or viewer handoff. Source routing does not guarantee CEC wake.

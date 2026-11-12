@@ -16,7 +16,7 @@ Use a local agent with access to your computer. A cloud-only agent can edit the 
 
 ```text
 Read AGENTS.md and docs/agent-tv-setup-guide.md. Help me install my own
-copy of CleanFrame on my Samsung The Frame. My model/firmware is:
+copy of CleanFrame65 on my Samsung The Frame. My model/firmware is:
 <supply it, or help me find it on the TV>.
 
 First preview the public-font app locally. Then inspect the reference

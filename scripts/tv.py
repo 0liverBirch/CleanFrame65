@@ -1,4 +1,4 @@
-"""Connect, inspect, install or launch CleanFrame. These commands preserve Home/startup settings."""
+"""Connect, inspect, install or launch CleanFrame65. These commands preserve Home/startup settings."""
 import argparse
 import hashlib
 import ipaddress
@@ -28,7 +28,7 @@ try:
         raise ValueError('Local SDB tool missing. See docs/development.md.')
     app_id = settings['identity']['app_id']
     # Reject a mismatched or unsafe package before connecting to the device.
-    widget = ROOT / 'dist/CleanFrame.wgt'
+    widget = ROOT / 'dist/CleanFrame65.wgt'
     if args.action == 'install':
         if not widget.exists():
             raise ValueError('Run npm run package first.')
@@ -60,7 +60,7 @@ elif args.action == 'launch':
         raise SystemExit('App launch was not confirmed. Check the TV.')
 else:
     digest = hashlib.sha256(widget.read_bytes()).hexdigest()[:12]
-    remote = '/home/owner/share/tmp/sdk_tools/CleanFrame-' + digest + '-' + str(time.time_ns()) + '.wgt'
+    remote = '/home/owner/share/tmp/sdk_tools/CleanFrame65-' + digest + '-' + str(time.time_ns()) + '.wgt'
     pushed = run('-s', serial, 'push', str(widget), remote)
     if '1 file(s) pushed' not in pushed or 'failed' in pushed.lower():
         raise SystemExit('Widget transfer was not confirmed.')
@@ -70,4 +70,4 @@ else:
     installed = run('-s', serial, 'shell', '0', 'applist', quiet=True)
     if app_id not in installed:
         raise SystemExit('App was not found in the installed-app list.')
-    print('CleanFrame installation confirmed. Startup defaults are unchanged.')
+    print('CleanFrame65 installation confirmed. Startup defaults are unchanged.')
