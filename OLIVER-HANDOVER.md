@@ -287,15 +287,48 @@ needs me; stop and ask if a step does not match your screen.
 
 ### 1. Push the branch to your fork
 
+**Status 12 Nov 2026: the push is the one remaining step, and it is
+blocked in this environment — see the note at the end of this section.
+The branch is committed locally (HEAD `0a63314`, plus this handover
+note) but it is NOT on GitHub yet. The remote still has only `main`
+at upstream `845f332`; there is no `oliver-launcher` branch there.**
+
+What I tried, in order:
+- `git push origin oliver-launcher` over HTTPS — no credentials in
+  this environment (no credential helper configured), so Git failed
+  with `fatal: could not read Username for 'https://github.com'`.
+- `gh auth status` — not logged into any GitHub host here.
+- SSH (`git@github.com`) — blocked by this machine's network proxy
+  (connection reset), so no SSH push either.
+- The GitHub connector's `push_files` snapshot route — does not fit
+  this branch: it only pushes UTF-8 files, no binaries and no Git
+  history, and this repo has 114 tracked binary files (photos, fonts,
+  icons) across 6 local commits on top of upstream. A snapshot would
+  either fail validation or land as a single squashed commit without
+  the history, so it was not attempted. Starting a new auth flow
+  (`gh auth login`, a PAT, or credentials in a Git command) is not
+  allowed from here.
+
+To finish it, run this from a machine that already has GitHub
+credentials for your account — your Mac with GitHub Desktop, or a
+clone there:
+
 ```sh
 cd <your clone of 0liverBirch/CleanFrame65>
 git checkout oliver-launcher
 git push -u origin oliver-launcher
 ```
 
-The local commit on this branch was made with a clearly local/agent git
-identity, not yours. Re-author it if you want your name on it
-(`git commit --amend --reset-author` before pushing, or just leave it).
+Or, from this checkout, if credentials are ever configured here:
+`git push -u origin oliver-launcher` (remote `origin` already points
+at your fork, `upstream` at nthnclrk/CleanFrame). After the push,
+verify the remote HEAD matches the local head (the handover-note
+commit on top of `0a63314`) before installing from it.
+
+The local commits on this branch were made with a clearly local/agent
+git identity, not yours. Re-author them if you want your name on them
+(`git commit --amend --reset-author` before pushing, or just leave
+it).
 
 Only these files are committed: `.gitignore`, `README.md`,
 `app/assets/wallpapers/README.md`, `app/main.js`, `app/style.css`,
