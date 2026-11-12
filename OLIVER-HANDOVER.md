@@ -102,8 +102,8 @@ look changes in one save. Your choice is remembered across restarts.
 2. **Device Photos** — Apple TV-style cards (see above): each Home tile
    is a large rounded card with rich artwork filling it and the photo of
    the actual box on top (Apple TV 4K + remote over a cinematic living
-   room, PS5 Slim + controller over a neon game canyon, Sky Q box over a
-   floodlit stadium). The focused card lifts with a white ring and strong
+   room, original PS5 + controller over a neon game canyon, Sky Stream
+   box over a floodlit stadium). The focused card lifts with a white ring and strong
    shadow, the others dim, and a wide halo of that device's backdrop
    glows behind the whole dock row around the focused card, fading out
    as it spreads away from it, while the theme background shows through
@@ -239,30 +239,45 @@ originals in `~/workspace/your_files/frame-art/` (JFK diner first), the
 device photos are the three PNGs in `.local/oliver-devices/`, and the theme
 backgrounds are made by `python3 .local/make-backgrounds.py` (needs the
 Petty #43 B&W original in the Frame-art folder). The
-preparation steps are in `.local/cutout-devices.py` (device photos) and the
+preparation steps are in `.local/cutout-real-devices.py` (device photos;
+the older `.local/cutout-devices.py` made the AI versions) and the
 earlier wallpaper preparation used Pillow `ImageOps.fit` to 1920×1080 plus
 upstream `node scripts/build-materials.mjs`.
 
 ### Device photos — what they are
 
-There are no clean, licensable transparent product photos of these three
-boxes to download, so the three images are AI-generated studio shots of the
-actual products, cut out to transparent PNGs:
+These are Oliver's own real product photos, supplied 12 Nov 2026, with
+their backgrounds removed (`.local/cutout-real-devices.py`). They replaced
+the AI-generated studio shots used before (those are backed up in
+`.local/device-ai-backup/`). The filenames are kept — `ps5-slim.png` and
+`sky-q.png` — because `app/main.js`, `scripts/apply-oliver-assets.py`
+and `.local/verify-oliver.mjs` all reference them by name, but the
+contents are no longer a Slim or a Sky Q:
 
-- **Apple TV 4K + Siri Remote** — accurate (black puck, silver clickpad
-  remote). It renders smaller than the other two on a tile because the
-  remote stands tall, making the image nearly square. A wider re-shoot is
-  possible if it bothers you.
-- **PS5 Slim + DualSense** — accurate Slim (diagonal split, white plates).
-  This render is the **disc-edition** Slim. Say if yours is the digital
-  edition and I will swap it. The console stands on a dark floor shadow
-  that is part of the image; it blends into the dark theme.
-- **Sky Q box** — accurate Sky Q 2TB box (Sky logo, Q button, green LED).
-  If your Sky box is a different model (Sky Stream, Sky Glass, older Sky+),
-  say so and I will match it.
+- **Apple TV 4K + Siri Remote** — black box, silver clickpad remote.
+  It renders smaller than the Sky photo on a tile because the remote
+  stands tall, making the image nearly square (827×814, so about
+  152px wide at the 150px tile height). That is the real photo's shape;
+  it cannot be made wider without cropping the remote or the box.
+- **PS5 + DualSense** — Sony's original (2020) PS5, tall disc-edition
+  console standing upright, **not a Slim** — use the photo as supplied,
+  do not try to turn it into a Slim. The supplied PNG was already
+  transparent, so it was only trimmed to its content (510×592, so
+  about 129px wide at tile height — narrower than the AI Slim it
+  replaced, which was a wider composition). The console's own soft
+  studio glow under the controller is part of the photo; it reads as a
+  faint mist under the controller on dark backgrounds and is barely
+  visible at tile size.
+- **Sky Stream box + remote** — the small black Sky Stream box with the
+  long black remote, **not a Sky Q box**. The supplied image also had a
+  "sky stream" logo banner across the top; that was cropped out (cut at
+  y=640 — the banner ends at y~630 and the device starts below it), so
+  the photo is just the box + remote (1000×480, about 312px wide at
+  tile height). The "sky" wordmark printed on the box itself stays —
+  that is part of the device.
 
-A faint shadow remnant is visible under the Apple TV box if you look at the
-full-size PNG closely; it is not visible at tile size.
+A faint white shadow sliver survives under the Apple TV box (the photo's
+own floor shadow); it is barely visible at tile size.
 
 ## Steps you still do on your Mac + TV, in order
 
@@ -382,7 +397,7 @@ Home/startup change as a separate decision with its own recovery plan.
   device tests).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures** (upstream suite plus the new Theme group checks).
-- `.local/verify-oliver.mjs` (own checks) — **116/116 passed**: fresh install
+- `.local/verify-oliver.mjs` (own checks) — **117/117 passed**: fresh install
   (Minimal Black & White, dark Dock, three HDMI tiles in order, 24-hour
   clock, JFK wallpaper), hero (today's date, time-appropriate greeting,
   clock enlarged by transform) and Tonight strip (names all three boxes,
@@ -404,12 +419,16 @@ Home/startup change as a separate decision with its own recovery plan.
   focus halo in Device Photos (1920×880 layer centred
   on the focused tile, radial-gradient mask 940×420 full strength to 60%,
   core reaching the neighbouring cards' centres, hero staying clean above
-  it, following focus across all three devices).
+  it, following focus across all three devices). The device PNGs are now
+  Oliver's real product photos (12 Nov 2026 — see "Device photos" below);
+  a check reads their corners off a canvas and pins their sizes
+  (Apple TV 827×814, original PS5 510×592, Sky Stream 1000×480), so a
+  white-background photo can never slip back in unnoticed.
 - `npm run check:public` — passed (bounded secret audit; see below).
 - Public export built from a clean checkout (photos removed first):
   `dist/CleanFrame-public-unsigned.wgt`, SHA-256
-  `15a37ee99bf4f0c9b6ee7621a56634171db023d635256357cd7ec93c8eff4e7d`,
-  15,792,257 bytes, 152 entries, only the 15 upstream wallpapers, no
+  `26d49bd379b73ac61b8f0f02202b3c5a634fe59c60b664480aa889ea41a51ff9`,
+  15,792,259 bytes, 152 entries, only the 15 upstream wallpapers, no
   Oliver photos, no device photos, no theme backgrounds and no CRT bezel.
   The themes, the hero, the Tonight strip, the bigger tiles, the card
   code and the halo are in the package (checked: `PRESETS`, `focusBg`,
@@ -425,7 +444,7 @@ Home/startup change as a separate decision with its own recovery plan.
   `python3 scripts/check.py`, `node --test scripts/test-device.mjs`).
 - `CLEANFRAME_PUBLIC_FONTS=1 npm run check:browser` — **432 checks,
   0 failures**.
-- `.local/verify-oliver.mjs` — **116/116 passed** (see above). It
+- `.local/verify-oliver.mjs` — **117/117 passed** (see above). It
   produced the three focus screenshots
   (`.local/qa/themes/theme-devices-focus-appletv.png`,
   `theme-devices-focus-ps5.png`, `theme-devices-focus-sky.png`) and
@@ -499,6 +518,35 @@ Home/startup change as a separate decision with its own recovery plan.
 - Checks after the change: verify 116/116, browser suite 432/0, public
   export rebuilt (SHA `15a37ee9…` above), assets reinstalled, committed
   locally on `oliver-launcher` (still NOT pushed).
+
+### Real device photos (12 Nov 2026) — Oliver's own product photos
+
+- Oliver supplied three real product photos, and they replaced the
+  AI-generated device PNGs (`.local/cutout-real-devices.py`, backgrounds
+  removed; the AI PNGs are backed up in `.local/device-ai-backup/`):
+  Apple TV 4K + Siri Remote (white JPEG background, border-connected
+  near-white flood-fill, 827×814), Sony's original (2020) PS5 +
+  DualSense (the supplied PNG was already transparent — trimmed only,
+  510×592; it is a disc-edition original, **not** a Slim, used as
+  supplied), and Sky Stream box + remote (logo banner cropped off at
+  y=640 — it ends at y~630 and the device starts below — then the same
+  white flood-fill, 1000×480; **not** a Sky Q box). Filenames are kept
+  (`ps5-slim.png`, `sky-q.png`) because the code references them by
+  name; the handover, `MANIFEST.json` notes, `docs/interaction-
+  behaviour.md` and the apply script all now record what is actually
+  in them.
+- Rendered sizes on a tile (mark box 340×150, `object-fit: contain`):
+  Apple TV about 152px wide, PS5 about 129px wide, Sky about 312px
+  wide. The PS5 is noticeably narrower than the AI Slim it replaced
+  (231px) because the real photo is a tall upright console; the Apple
+  TV is square because the remote stands tall. Both are the real
+  photos' shapes — they cannot be made wider without cropping the
+  product. The card art and halo backdrops behind the tiles are
+  unchanged (still the AI-generated living room / canyon / stadium).
+- Checks after the change: verify 117/117 (new check: transparent
+  corners + pinned sizes for the three PNGs), browser suite 432/0,
+  public export rebuilt (SHA `26d49bd3…` above), assets reinstalled,
+  committed locally on `oliver-launcher` (still NOT pushed).
 
 ### VM filesystem breakage, 6 Nov 2026 ~10:41–12:14 — recovered
 
