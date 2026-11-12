@@ -102,7 +102,7 @@ look changes in one save. Your choice is remembered across restarts.
 2. **Device Photos** — Apple TV-style cards (see above): each Home tile
    is a large rounded card with rich artwork filling it and the photo of
    the actual box on top (Apple TV 4K + remote over a cinematic living
-   room, original PS5 + controller over a neon game canyon, Sky Stream
+   room, PS5 Slim + controller over a neon game canyon, Sky Stream
    box over a floodlit stadium). The focused card lifts with a white ring and strong
    shadow, the others dim, and a wide halo of that device's backdrop
    glows behind the whole dock row around the focused card, fading out
@@ -247,27 +247,28 @@ upstream `node scripts/build-materials.mjs`.
 ### Device photos — what they are
 
 These are Oliver's own real product photos, supplied 12 Nov 2026, with
-their backgrounds removed (`.local/cutout-real-devices.py`). They replaced
-the AI-generated studio shots used before (those are backed up in
-`.local/device-ai-backup/`). The filenames are kept — `ps5-slim.png` and
-`sky-q.png` — because `app/main.js`, `scripts/apply-oliver-assets.py`
-and `.local/verify-oliver.mjs` all reference them by name, but the
-contents are no longer a Slim or a Sky Q:
+their backgrounds removed (`.local/cutout-real-devices.py`, PS5 Slim by
+`.local/cutout-ps5-slim.py`). They replaced the AI-generated studio shots
+used before (those are backed up in `.local/device-ai-backup/`). The
+filenames are kept — `ps5-slim.png` and `sky-q.png` — because
+`app/main.js`, `scripts/apply-oliver-assets.py` and
+`.local/verify-oliver.mjs` all reference them by name. The PS5 file
+finally holds a Slim (swapped 12 Nov 2026, see below); the Sky file
+still holds a Sky Stream, not a Sky Q:
 
 - **Apple TV 4K + Siri Remote** — black box, silver clickpad remote.
   It renders smaller than the Sky photo on a tile because the remote
   stands tall, making the image nearly square (827×814, so about
   152px wide at the 150px tile height). That is the real photo's shape;
   it cannot be made wider without cropping the remote or the box.
-- **PS5 + DualSense** — Sony's original (2020) PS5, tall disc-edition
-  console standing upright, **not a Slim** — use the photo as supplied,
-  do not try to turn it into a Slim. The supplied PNG was already
-  transparent, so it was only trimmed to its content (510×592, so
-  about 129px wide at tile height — narrower than the AI Slim it
-  replaced, which was a wider composition). The console's own soft
-  studio glow under the controller is part of the photo; it reads as a
-  faint mist under the controller on dark backgrounds and is barely
-  visible at tile size.
+- **PS5 Slim + DualSense** — the Slim, disc edition, lying
+  horizontally with the controller to its right (621×199, so the full
+  340px wide at tile height — it fills the card, where the original
+  PS5's tall upright photo only reached about 129px). Oliver confirmed
+  12 Nov 2026 that his console is a Slim. A faint soft shadow survives
+  under the console (the photo's own studio shadow); it reads as a
+  subtle grey smudge under the console on dark backgrounds and is
+  barely visible at tile size.
 - **Sky Stream box + remote** — the small black Sky Stream box with the
   long black remote, **not a Sky Q box**. The supplied image also had a
   "sky stream" logo banner across the top; that was cropped out (cut at
@@ -422,13 +423,13 @@ Home/startup change as a separate decision with its own recovery plan.
   it, following focus across all three devices). The device PNGs are now
   Oliver's real product photos (12 Nov 2026 — see "Device photos" below);
   a check reads their corners off a canvas and pins their sizes
-  (Apple TV 827×814, original PS5 510×592, Sky Stream 1000×480), so a
+  (Apple TV 827×814, PS5 Slim 621×199, Sky Stream 1000×480), so a
   white-background photo can never slip back in unnoticed.
 - `npm run check:public` — passed (bounded secret audit; see below).
 - Public export built from a clean checkout (photos removed first):
   `dist/CleanFrame-public-unsigned.wgt`, SHA-256
-  `26d49bd379b73ac61b8f0f02202b3c5a634fe59c60b664480aa889ea41a51ff9`,
-  15,792,259 bytes, 152 entries, only the 15 upstream wallpapers, no
+  `94a97d73dba8a62284e9d36b0b68a1ad1143f91a671fa1259b238908882a3cd6`,
+  15,792,260 bytes, 152 entries, only the 15 upstream wallpapers, no
   Oliver photos, no device photos, no theme backgrounds and no CRT bezel.
   The themes, the hero, the Tonight strip, the bigger tiles, the card
   code and the halo are in the package (checked: `PRESETS`, `focusBg`,
@@ -528,25 +529,67 @@ Home/startup change as a separate decision with its own recovery plan.
   near-white flood-fill, 827×814), Sony's original (2020) PS5 +
   DualSense (the supplied PNG was already transparent — trimmed only,
   510×592; it is a disc-edition original, **not** a Slim, used as
-  supplied), and Sky Stream box + remote (logo banner cropped off at
-  y=640 — it ends at y~630 and the device starts below — then the same
-  white flood-fill, 1000×480; **not** a Sky Q box). Filenames are kept
+  supplied — since replaced by the Slim, see next subsection), and Sky
+  Stream box + remote (logo banner cropped off at y=640 — it ends at
+  y~630 and the device starts below — then the same white flood-fill,
+  1000×480; **not** a Sky Q box). Filenames are kept
   (`ps5-slim.png`, `sky-q.png`) because the code references them by
   name; the handover, `MANIFEST.json` notes, `docs/interaction-
   behaviour.md` and the apply script all now record what is actually
   in them.
 - Rendered sizes on a tile (mark box 340×150, `object-fit: contain`):
   Apple TV about 152px wide, PS5 about 129px wide, Sky about 312px
-  wide. The PS5 is noticeably narrower than the AI Slim it replaced
+  wide. The PS5 was noticeably narrower than the AI Slim it replaced
   (231px) because the real photo is a tall upright console; the Apple
   TV is square because the remote stands tall. Both are the real
   photos' shapes — they cannot be made wider without cropping the
   product. The card art and halo backdrops behind the tiles are
   unchanged (still the AI-generated living room / canyon / stadium).
+  (The PS5 size below is now the Slim's — see next subsection.)
 - Checks after the change: verify 117/117 (new check: transparent
   corners + pinned sizes for the three PNGs), browser suite 432/0,
   public export rebuilt (SHA `26d49bd3…` above), assets reinstalled,
   committed locally on `oliver-launcher` (still NOT pushed).
+
+### PS5 Slim swap (12 Nov 2026) — the tile now shows his actual console
+
+- Oliver confirmed his console is a PS5 Slim ("yes please" to swapping
+  the photo; his Sony cover letter also says "I have a PS5 Slim at
+  home"), so the original-2020 PS5 photo was swapped for a Slim.
+  Disc vs digital is still unconfirmed — assumed disc edition,
+  matching the disc photo he supplied originally.
+- Source: Amazon listing image `51v1iiwtHkL._SL1500_` (Sony marketing
+  render), `https://webexwp.com/wp-content/uploads/2026/08/51v1iiwtHkL._SL1500_-768x512.jpg`
+  (page: `https://webexwp.com?action=yith-woocompare-add-product&id=18877`).
+  Saved local-only as `.local/ps5-slim-source.jpg`. The console lies
+  horizontally with the DualSense to its right, on a plain white
+  background, no text, no watermark. Verified a Slim, not the original
+  and not a Pro: split side panels with the black slit, disc-drive
+  bulge at the right end, no Pro vent fins. (A horizontal RBK shot was
+  rejected — it showed the Pro's vent fins. Sony's official upright
+  Slim on `gmedia.playstation.com` was the runner-up: already
+  transparent, console + controller side by side, but it renders only
+  ~136px wide at tile height with its console smaller than the
+  original's, so it fails the aim of filling the card. The horizontal
+  shot was chosen instead — it is a different composition from the
+  original photo's upright console, and that is deliberate.)
+- Cutout (`.local/cutout-ps5-slim.py`): the same border-connected
+  near-white flood-fill as the other real photos (threshold 240, 1.2px
+  feather, trim +12px pad), so the white console plates survive.
+  Result 621×199, transparent corners, renders the full 340px wide at
+  tile height (console itself about 214px) vs about 129px for the
+  original — the Slim finally fills its card. The previous original-PS5
+  PNG is backed up as `.local/device-ai-backup/ps5-original-2020.png`
+  (the AI Slim stays as `.local/device-ai-backup/ps5-slim.png`).
+  Apple TV and Sky Stream are untouched.
+- Checks after the change: verify 117/117 (the pinned PS5 size updated
+  to 621×199, so a wrong console can never slip back in unnoticed),
+  browser suite 432/0, `npm run check` passed, `check:public` passed,
+  public export rebuilt (SHA below), assets reinstalled 28/28, 3/3,
+  4/4, 1/1, 6/6, all five themes + three focus shots re-shot 12 Nov
+  and visually checked — the Slim is a clean cutout with no white halo
+  in Device Photos, Futuristic, Art Mode and the 90s CRT buttons.
+  Committed locally on `oliver-launcher` (still NOT pushed).
 
 ### VM filesystem breakage, 6 Nov 2026 ~10:41–12:14 — recovered
 

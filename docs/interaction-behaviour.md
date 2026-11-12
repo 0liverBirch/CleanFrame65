@@ -120,7 +120,7 @@ strip are not focusable.
 - Device Photos is the Apple TV-style theme: each Home tile is a large
   rounded card whose rich artwork fills the tile — a cinematic living
   room behind the Apple TV 4K + remote, a neon game canyon behind the
-  original PS5 + controller, a floodlit stadium behind the Sky Stream box — with
+  PS5 Slim + controller, a floodlit stadium behind the Sky Stream box — with
   the transparent photo of the actual box on top. The focused card lifts
   (slightly larger, strong drop shadow, white ring) while the others sit
   flatter and dimmer, and a wide halo follows focus: that device's

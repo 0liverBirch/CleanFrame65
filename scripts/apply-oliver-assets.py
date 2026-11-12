@@ -3,7 +3,7 @@ Device Photos for the Device Photos theme, and theme backgrounds.
 
 The four photos (JFK at the diner, Mustang at the villa, Superbird in the
 desert, Petty #43), the three device photos (Apple TV 4K + remote, PS5
-original PS5 + controller, Sky Stream box) and the four theme backgrounds (Petty #43 B&W
+Slim + controller, Sky Stream box) and the four theme backgrounds (Petty #43 B&W
 dimmed for Minimal, dark shelf gradient for Device Photos, nebula/grid for
 Futuristic, Memphis wash for 90s TV) are Oliver's own images. They are NOT
 in this repository: this fork is public, and committing them would publish
